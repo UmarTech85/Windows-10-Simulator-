@@ -3677,7 +3677,7 @@ SmartScreen Protection: Enabled
                 id={`edge-iframe-${activeTab.id}`}
                 src={activeTab.url}
                 title={activeTab.title}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                sandbox="allow-scripts allow-forms allow-popups allow-modals"
                 className="w-full h-full border-none min-h-[500px]"
               />
             </div>
