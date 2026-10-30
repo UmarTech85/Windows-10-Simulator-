@@ -73,6 +73,15 @@ interface Tab {
   inPrivate?: boolean;
 }
 
+const isGoogleDomainUrl = (url: string) => {
+  try {
+    const hostname = new URL(url).hostname;
+    return hostname === 'google.com' || hostname.endsWith('.google.com');
+  } catch {
+    return false;
+  }
+};
+
 interface DownloadItem {
   id: string;
   filename: string;
@@ -1295,7 +1304,7 @@ export const EdgeBrowser: React.FC = () => {
                   : 'bg-transparent text-zinc-600 hover:bg-zinc-200 border-transparent'
               }`}
             >
-              {tab.view === 'google' || tab.view === 'googleSearch' || tab.url.includes('google.com') ? (
+              {tab.view === 'google' || tab.view === 'googleSearch' || isGoogleDomainUrl(tab.url) ? (
                 <GoogleGIcon className="w-3.5 h-3.5 shrink-0" />
               ) : tab.inPrivate ? (
                 <Shield size={12} className="text-purple-400 shrink-0" />
