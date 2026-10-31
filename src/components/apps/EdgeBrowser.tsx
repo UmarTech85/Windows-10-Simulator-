@@ -82,6 +82,35 @@ const isGoogleDomainUrl = (url: string) => {
   }
 };
 
+const getSafeHttpUrl = (url: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:'
+      ? parsedUrl.href
+      : 'about:blank';
+  } catch {
+    return 'about:blank';
+  }
+};
+
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (character) => {
+    switch (character) {
+      case '&':
+        return '&amp;';
+      case '<':
+        return '&lt;';
+      case '>':
+        return '&gt;';
+      case '"':
+        return '&quot;';
+      case "'":
+        return '&#39;';
+      default:
+        return character;
+    }
+  });
+
 interface DownloadItem {
   id: string;
   filename: string;
@@ -855,11 +884,17 @@ export const EdgeBrowser: React.FC = () => {
   };
 
   const handleSavePageAsHtml = () => {
+    const pageUrl = getSafeHttpUrl(activeTab.url);
+    const articleContent = liveWikiArticle
+      ? `<p>${escapeHtml(liveWikiArticle.extract)}</p>`
+      : WIKI_ARTICLES[selectedWiki]?.content
+          .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+          .join('') ?? `<p>Webpage content archived inside Microsoft Edge Windows 10 Simulator.</p>`;
     const html = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>${activeTab.title}</title>
+  <title>${escapeHtml(activeTab.title)}</title>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.6; color: #333; }
     h1 { color: #0078d7; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -868,14 +903,14 @@ export const EdgeBrowser: React.FC = () => {
 </head>
 <body>
   <div class="badge">Archived from Microsoft Edge on Windows 10</div>
-  <h1>${activeTab.title}</h1>
+  <h1>${escapeHtml(activeTab.title)}</h1>
   <p><strong>Archived on:</strong> ${new Date().toLocaleString()}</p>
-  <p><strong>URL:</strong> <a href="${activeTab.url}">${activeTab.url}</a></p>
+  <p><strong>URL:</strong> <a href="${escapeHtml(pageUrl)}">${escapeHtml(activeTab.url)}</a></p>
   <hr>
   <div>
     ${
-      activeTab.view === 'wiki' && (liveWikiArticle || WIKI_ARTICLES[selectedWiki])
-        ? (liveWikiArticle ? `<p>${liveWikiArticle.extract}</p>` : WIKI_ARTICLES[selectedWiki].content.map(p => `<p>${p}</p>`).join(''))
+      activeTab.view === 'wiki'
+        ? articleContent
         : `<p>Webpage content archived inside Microsoft Edge Windows 10 Simulator.</p>`
     }
   </div>
@@ -3626,7 +3661,7 @@ SmartScreen Protection: Enabled
                 <button
                   onClick={() => {
                     const iframe = document.getElementById(`edge-iframe-${activeTab.id}`) as HTMLIFrameElement | null;
-                    if (iframe) iframe.src = activeTab.url;
+                    if (iframe) iframe.src = getSafeHttpUrl(activeTab.url);
                   }}
                   className="px-2 py-1 bg-white dark:bg-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 rounded border border-zinc-300 dark:border-zinc-600 text-xs flex items-center gap-1 cursor-pointer"
                 >
@@ -3635,7 +3670,7 @@ SmartScreen Protection: Enabled
                 </button>
 
                 <button
-                  onClick={() => window.open(activeTab.url, '_blank')}
+                  onClick={() => window.open(getSafeHttpUrl(activeTab.url), '_blank')}
                   className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium text-xs flex items-center gap-1 shadow-2xs cursor-pointer"
                 >
                   <ExternalLink size={12} />
@@ -3675,7 +3710,7 @@ SmartScreen Protection: Enabled
             <div className="flex-1 w-full bg-white relative">
               <iframe
                 id={`edge-iframe-${activeTab.id}`}
-                src={activeTab.url}
+                src={getSafeHttpUrl(activeTab.url)}
                 title={activeTab.title}
                 sandbox="allow-scripts allow-forms allow-popups allow-modals"
                 className="w-full h-full border-none min-h-[500px]"
