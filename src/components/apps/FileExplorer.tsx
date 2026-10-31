@@ -379,8 +379,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({
                       {file.type === 'folder' ? (
                         <AppIcon name="folder" size={38} />
                       ) : file.extension === 'jpg' || file.extension === 'png' ? (
-                        file.content?.startsWith('/src/assets/') ||
-                        /^data:image\/(?:png|jpeg);base64,/.test(file.content ?? '') ? (
+                        file.content?.startsWith('/src/assets') || file.content?.startsWith('data:') ? (
                           <img
                             src={file.content}
                             alt={file.name}
