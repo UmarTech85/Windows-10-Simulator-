@@ -205,8 +205,7 @@ export const Desktop: React.FC<DesktopProps> = ({
                 {file.type === 'folder' ? (
                   <AppIcon name="folder" size={iconGraphicSize} />
                 ) : file.extension === 'jpg' || file.extension === 'png' ? (
-                  file.content?.startsWith('/src/assets/') ||
-                  /^data:image\/(?:png|jpeg);base64,/.test(file.content ?? '') ? (
+                  file.content?.startsWith('/src/assets') || file.content?.startsWith('data:') ? (
                     <img
                       src={file.content}
                       alt={file.name}
