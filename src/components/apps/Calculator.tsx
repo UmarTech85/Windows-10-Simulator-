@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 import React, { useState, useEffect, useRef } from 'react';
 import { History, Trash2, Delete } from 'lucide-react';
 import { soundEngine } from '../../utils/sound';
@@ -68,7 +69,7 @@ export const Calculator: React.FC = () => {
       const current = parseFloat(display);
       const result = executeCalc(prevValue, current, operation);
       const histItem = `${prevValue} ${operation} ${current} = ${result}`;
-      setHistory((prev) => [histItem, ...prev].slice(0, 20));
+      setHistory((prev: string[]) => [histItem, ...prev].slice(0, 20));
       setDisplay(String(result));
       setPrevValue(null);
       setOperation(null);
@@ -207,13 +208,13 @@ export const Calculator: React.FC = () => {
           MR
         </button>
         <button
-          onClick={() => setMemory((m) => m + parseFloat(display))}
+          onClick={() => setMemory((m: number) => m + parseFloat(display))}
           className="px-2 py-0.5 hover:bg-zinc-200 rounded"
         >
           M+
         </button>
         <button
-          onClick={() => setMemory((m) => m - parseFloat(display))}
+          onClick={() => setMemory((m: number) => m - parseFloat(display))}
           className="px-2 py-0.5 hover:bg-zinc-200 rounded"
         >
           M-
@@ -383,7 +384,7 @@ export const Calculator: React.FC = () => {
             {history.length === 0 ? (
               <p className="text-zinc-400 text-xs text-center py-8">There's no history yet</p>
             ) : (
-              history.map((item, idx) => (
+              history.map((item: string, idx: number) => (
                 <div
                   key={idx}
                   onClick={() => {

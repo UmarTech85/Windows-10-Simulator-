@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 import React, { useState, useRef, useEffect } from 'react';
 import { AppId } from '../../types/os';
 import { soundEngine } from '../../utils/sound';
@@ -18,7 +19,7 @@ interface HistoryItem {
 export const CommandPrompt: React.FC<CommandPromptProps> = ({
   onLaunchApp,
   onTriggerBSOD,
-}) => {
+}: CommandPromptProps) => {
   const [history, setHistory] = useState<HistoryItem[]>([
     {
       id: 'init-1',
@@ -48,14 +49,14 @@ export const CommandPrompt: React.FC<CommandPromptProps> = ({
   const handleCommand = (cmdStr: string) => {
     const trimmed = cmdStr.trim();
     if (!trimmed) {
-      setHistory((prev) => [
+      setHistory((prev: HistoryItem[]) => [
         ...prev,
         { id: String(Date.now()), type: 'cmd', text: `C:\\Users\\User> ` },
       ]);
       return;
     }
 
-    setCommandHistory((prev) => [trimmed, ...prev]);
+    setCommandHistory((prev: string[]) => [trimmed, ...prev]);
     setHistoryIndex(-1);
 
     const parts = trimmed.split(' ');
@@ -238,7 +239,7 @@ export const CommandPrompt: React.FC<CommandPromptProps> = ({
         break;
     }
 
-    setHistory((prev) => [
+    setHistory((prev: HistoryItem[]) => [
       ...prev,
       cmdEntry,
       {
@@ -293,12 +294,12 @@ export const CommandPrompt: React.FC<CommandPromptProps> = ({
         </div>
       )}
 
-      {history.map((item) => (
+      {history.map((item: HistoryItem) => (
         <div key={item.id} className="mb-1 leading-relaxed">
           {item.type === 'cmd' && <div className="font-semibold">{item.text}</div>}
           {item.type === 'output' && (
             <div>
-              {item.lines?.map((line, idx) => (
+              {item.lines?.map((line: string, idx: number) => (
                 <div key={idx} className="whitespace-pre-wrap">
                   {line}
                 </div>
@@ -315,7 +316,7 @@ export const CommandPrompt: React.FC<CommandPromptProps> = ({
           ref={inputRef}
           type="text"
           value={currentInput}
-          onChange={(e) => setCurrentInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentInput(e.target.value)}
           onKeyDown={handleKeyDown}
           autoFocus
           spellCheck={false}

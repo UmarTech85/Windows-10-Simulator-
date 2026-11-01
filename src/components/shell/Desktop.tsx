@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   FolderPlus,
   FilePlus,
@@ -26,6 +26,12 @@ interface ContextMenuState {
   x: number;
   y: number;
   visible: boolean;
+  target?: {
+    type: 'shortcut' | 'file';
+    appId?: AppId;
+    file?: FileItem;
+    title?: string;
+  };
 }
 
 export const Desktop: React.FC<DesktopProps> = ({
@@ -40,6 +46,7 @@ export const Desktop: React.FC<DesktopProps> = ({
 }) => {
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({ x: 0, y: 0, visible: false });
   const [iconSize, setIconSize] = useState<'normal' | 'small' | 'large'>('normal');
+  const lastClickTimeRef = useRef<{ id: string; time: number }>({ id: '', time: 0 });
 
   // Rubber-band marquee selection
   const [selectionBox, setSelectionBox] = useState<{
@@ -57,10 +64,63 @@ export const Desktop: React.FC<DesktopProps> = ({
     { id: 'sc-thispc', title: 'This PC', appId: 'explorer', icon: 'explorer' },
     { id: 'sc-recycle', title: 'Recycle Bin', appId: 'recyclebin', icon: 'recyclebin' },
     { id: 'sc-edge', title: 'Microsoft Edge', appId: 'edge', icon: 'edge' },
+    { id: 'sc-dxdiag', title: 'DirectX 12 Diagnostic', appId: 'dxdiag', icon: 'dxdiag' },
   ];
 
   const desktopFiles = files.filter((f) => f.location === 'desktop' && !f.isRecycled);
   const recycledCount = files.filter((f) => f.isRecycled).length;
+
+  // Keyboard shortcut: Press Enter to open currently selected icon
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && selectedIconId) {
+        const sc = systemShortcuts.find((s) => s.id === selectedIconId);
+        if (sc) {
+          soundEngine.playClick();
+          onOpenApp(sc.appId);
+          return;
+        }
+        const fl = desktopFiles.find((f) => f.id === selectedIconId);
+        if (fl) {
+          soundEngine.playClick();
+          onOpenFile(fl);
+          return;
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIconId, desktopFiles, systemShortcuts, onOpenApp, onOpenFile]);
+
+  const handleShortcutClick = (sc: { id: string; appId: AppId }) => {
+    const now = Date.now();
+    const isRapidClick = lastClickTimeRef.current.id === sc.id && now - lastClickTimeRef.current.time < 500;
+    const isAlreadySelected = selectedIconId === sc.id;
+
+    lastClickTimeRef.current = { id: sc.id, time: now };
+
+    if (isRapidClick || isAlreadySelected) {
+      soundEngine.playClick();
+      onOpenApp(sc.appId);
+    } else {
+      onSelectIcon(sc.id);
+    }
+  };
+
+  const handleFileClick = (file: FileItem) => {
+    const now = Date.now();
+    const isRapidClick = lastClickTimeRef.current.id === file.id && now - lastClickTimeRef.current.time < 500;
+    const isAlreadySelected = selectedIconId === file.id;
+
+    lastClickTimeRef.current = { id: file.id, time: now };
+
+    if (isRapidClick || isAlreadySelected) {
+      soundEngine.playClick();
+      onOpenFile(file);
+    } else {
+      onSelectIcon(file.id);
+    }
+  };
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -69,6 +129,21 @@ export const Desktop: React.FC<DesktopProps> = ({
       x: Math.min(e.clientX, window.innerWidth - 200),
       y: Math.min(e.clientY, window.innerHeight - 240),
       visible: true,
+    });
+  };
+
+  const handleIconContextMenu = (
+    e: React.MouseEvent,
+    target: { type: 'shortcut' | 'file'; appId?: AppId; file?: FileItem; title?: string }
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    soundEngine.playClick();
+    setContextMenu({
+      x: Math.min(e.clientX, window.innerWidth - 200),
+      y: Math.min(e.clientY, window.innerHeight - 240),
+      visible: true,
+      target,
     });
   };
 
@@ -127,8 +202,10 @@ export const Desktop: React.FC<DesktopProps> = ({
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      className="fixed inset-0 bottom-[44px] bg-cover bg-center select-none font-sans overflow-hidden"
-      style={{ backgroundImage: `url(${wallpaper})` }}
+      className="fixed inset-0 bottom-[44px] bg-cover bg-center select-none font-sans overflow-hidden bg-[#004e92]"
+      style={{
+        backgroundImage: `url(${wallpaper}), linear-gradient(135deg, #091222 0%, #004e92 50%, #001f3f 100%)`,
+      }}
     >
       {/* Rubber-band Marquee Selection Rectangle */}
       {selectionBox.active && (
@@ -153,13 +230,20 @@ export const Desktop: React.FC<DesktopProps> = ({
               key={sc.id}
               onClick={(e) => {
                 e.stopPropagation();
-                onSelectIcon(sc.id);
+                handleShortcutClick(sc);
               }}
               onDoubleClick={(e) => {
                 e.stopPropagation();
                 soundEngine.playClick();
                 onOpenApp(sc.appId);
               }}
+              onContextMenu={(e) =>
+                handleIconContextMenu(e, {
+                  type: 'shortcut',
+                  appId: sc.appId,
+                  title: sc.title,
+                })
+              }
               className={`${iconDimClass} flex flex-col items-center justify-center p-1.5 rounded cursor-pointer transition-colors border group ${
                 isSelected
                   ? 'bg-blue-600/35 border-blue-400/80 shadow-xs'
@@ -188,13 +272,20 @@ export const Desktop: React.FC<DesktopProps> = ({
               key={file.id}
               onClick={(e) => {
                 e.stopPropagation();
-                onSelectIcon(file.id);
+                handleFileClick(file);
               }}
               onDoubleClick={(e) => {
                 e.stopPropagation();
                 soundEngine.playClick();
                 onOpenFile(file);
               }}
+              onContextMenu={(e) =>
+                handleIconContextMenu(e, {
+                  type: 'file',
+                  file,
+                  title: file.name,
+                })
+              }
               className={`${iconDimClass} flex flex-col items-center justify-center p-1.5 rounded cursor-pointer transition-colors border group ${
                 isSelected
                   ? 'bg-blue-600/35 border-blue-400/80 shadow-xs'
@@ -231,9 +322,30 @@ export const Desktop: React.FC<DesktopProps> = ({
       {contextMenu.visible && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="fixed bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-xl rounded-sm py-1 z-50 text-xs text-zinc-800 w-48 font-sans animate-fadeIn select-none"
+          className="fixed bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-xl rounded-sm py-1 z-50 text-xs text-zinc-800 w-52 font-sans animate-fadeIn select-none"
           style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}
         >
+          {/* Target Icon Actions */}
+          {contextMenu.target && (
+            <>
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  if (contextMenu.target?.type === 'shortcut' && contextMenu.target.appId) {
+                    onOpenApp(contextMenu.target.appId);
+                  } else if (contextMenu.target?.type === 'file' && contextMenu.target.file) {
+                    onOpenFile(contextMenu.target.file);
+                  }
+                  setContextMenu({ ...contextMenu, visible: false });
+                }}
+                className="w-full text-left px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between font-semibold"
+              >
+                <span>Open {contextMenu.target.title ? `"${contextMenu.target.title}"` : ''}</span>
+              </button>
+              <div className="border-t border-zinc-200 my-1" />
+            </>
+          )}
+
           {/* View size toggle */}
           <button
             onClick={() => {

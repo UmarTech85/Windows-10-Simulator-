@@ -36,12 +36,21 @@ export const DesktopMediaWidget: React.FC<DesktopMediaWidgetProps> = ({
         ];
         setBars(nextBars);
       } else {
-        setBars((prev) => prev.map((v) => Math.max(3, v * 0.85)));
+        setBars((prev) => {
+          if (prev.every((v) => v <= 3.01)) return prev;
+          return prev.map((v) => Math.max(3, v * 0.85));
+        });
       }
-      animRef.current = requestAnimationFrame(loop);
+      if (player.isPlaying) {
+        animRef.current = requestAnimationFrame(loop);
+      }
     };
 
-    animRef.current = requestAnimationFrame(loop);
+    if (player.isPlaying) {
+      animRef.current = requestAnimationFrame(loop);
+    } else {
+      setBars([3, 3, 3, 3, 3]);
+    }
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };

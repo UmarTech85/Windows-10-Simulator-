@@ -1,29 +1,81 @@
+/** @jsxRuntime classic */
+// @ts-ignore - React is provided by the host runtime in this project
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Play,
-  Pause,
-  SkipBack,
-  SkipForward,
-  Volume2,
-  VolumeX,
-  Music,
-  Disc3,
-  ListMusic,
-  Heart,
-  Shuffle,
-  Repeat,
-  Repeat1,
-  Sliders,
-  Upload,
-  Search,
-  Plus,
-  User,
-  Radio,
-  Sparkles,
-} from 'lucide-react';
 import { GrooveTrack, MusicPlayerState } from '../../types/music';
 import { musicGenerator, EQ_FREQUENCIES, EQ_PRESETS } from '../../utils/musicSynth';
 import { soundEngine } from '../../utils/sound';
+
+type IconName =
+  | 'Play' | 'Pause' | 'SkipBack' | 'SkipForward' | 'Volume2' | 'VolumeX'
+  | 'Music' | 'Disc3' | 'ListMusic' | 'Heart' | 'Shuffle' | 'Repeat'
+  | 'Repeat1' | 'Sliders' | 'Upload' | 'Search' | 'Plus' | 'User' | 'Radio'
+  | 'Sparkles';
+
+interface IconProps {
+  size?: number;
+  className?: string;
+}
+
+const iconPaths: Record<IconName, string> = {
+  Play: 'm7 4 13 8-13 8z',
+  Pause: 'M7 4h4v16H7z M15 4h4v16h-4z',
+  SkipBack: 'M19 20 9 12l10-8z M5 19V5',
+  SkipForward: 'm5 4 10 8-10 8z M19 5v14',
+  Volume2: 'M11 5 6 9H3v6h3l5 4z M15.5 8.5a5 5 0 0 1 0 7 M19 5a10 10 0 0 1 0 14',
+  VolumeX: 'M11 5 6 9H3v6h3l5 4z M16 9l5 6 M21 9l-5 6',
+  Music: 'M9 18V5l12-2v13 M9 9l12-2 M9 18a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3z M21 16a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3z',
+  Disc3: 'M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0-18 0 M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M12 3v2 M21 12h-2 M12 21v-2 M3 12h2',
+  ListMusic: 'M16 8h6 M16 12h6 M16 16h6 M4 19V5l10-2v14 M4 19a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3z M14 17a3 3 0 1 1-3-3c1.7 0 3 1.3 3 3z',
+  Heart: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z',
+  Shuffle: 'm18 14 4 4-4 4 M18 2l4 4-4 4 M2 18h2.5a5 5 0 0 0 4-2l7-10a5 5 0 0 1 4-2H22 M2 6h2.5a5 5 0 0 1 4 2 M14 16l1.5 2a5 5 0 0 0 4 2H22',
+  Repeat: 'M17 2l4 4-4 4 M3 11V9a3 3 0 0 1 3-3h15 M7 22l-4-4 4-4 M21 13v2a3 3 0 0 1-3 3H3',
+  Repeat1: 'M17 2l4 4-4 4 M3 11V9a3 3 0 0 1 3-3h15 M7 22l-4-4 4-4 M21 13v2a3 3 0 0 1-3 3H3 M12 10v5 M11 10h2',
+  Sliders: 'M4 21v-7 M4 10V3 M12 21v-9 M12 8V3 M20 21v-5 M20 12V3 M2 14h4 M10 8h4 M18 16h4',
+  Upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4 M17 8l-5-5-5 5 M12 3v12',
+  Search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.3-4.3',
+  Plus: 'M12 5v14 M5 12h14',
+  User: 'M20 21a8 8 0 0 0-16 0 M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  Radio: 'M4.9 19.1a10 10 0 0 1 0-14.2 M8.5 15.5a5 5 0 0 1 0-7 M12 12h.01 M16 8l5-5 M18 13a6 6 0 0 1-6 6H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h7a6 6 0 0 1 6 6z',
+  Sparkles: 'm12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z M19 14l1.2 2.8L23 18l-2.8 1.2L19 22l-1.2-2.8L15 18l2.8-1.2z M5 2l.8 2.2L8 5l-2.2.8L5 8l-.8-2.2L2 5l2.2-.8z',
+};
+
+const createIcon = (name: IconName) => ({ size = 24, className }: IconProps) => (
+  <svg
+    aria-hidden="true"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d={iconPaths[name]} />
+  </svg>
+);
+
+const Play = createIcon('Play');
+const Pause = createIcon('Pause');
+const SkipBack = createIcon('SkipBack');
+const SkipForward = createIcon('SkipForward');
+const Volume2 = createIcon('Volume2');
+const VolumeX = createIcon('VolumeX');
+const Music = createIcon('Music');
+const Disc3 = createIcon('Disc3');
+const ListMusic = createIcon('ListMusic');
+const Heart = createIcon('Heart');
+const Shuffle = createIcon('Shuffle');
+const Repeat = createIcon('Repeat');
+const Repeat1 = createIcon('Repeat1');
+const Sliders = createIcon('Sliders');
+const Upload = createIcon('Upload');
+const Search = createIcon('Search');
+const Plus = createIcon('Plus');
+const User = createIcon('User');
+const Radio = createIcon('Radio');
+const Sparkles = createIcon('Sparkles');
 
 interface GrooveMusicProps {
   player: MusicPlayerState;
@@ -31,7 +83,7 @@ interface GrooveMusicProps {
 
 type ViewMode = 'songs' | 'artists' | 'albums' | 'playlists' | 'nowPlaying' | 'equalizer';
 
-export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
+export const GrooveMusic = ({ player }: GrooveMusicProps) => {
   const [activeView, setActiveView] = useState<ViewMode>('songs');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -80,7 +132,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
         }
         setWaveData(waveSamples);
       } else if (!player.isPlaying) {
-        setSpectrumData((prev) => prev.map((v) => Math.max(4, v * 0.92)));
+        setSpectrumData((prev: number[]) => prev.map((v) => Math.max(4, v * 0.92)));
       }
       animFrameRef.current = requestAnimationFrame(updateVisualizer);
     };
@@ -140,7 +192,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
       name,
       trackIds: [],
     };
-    setPlaylists((prev) => [...prev, newPl]);
+    setPlaylists((prev: { id: string; name: string; trackIds: string[] }[]) => [...prev, newPl]);
     setNewPlaylistName('');
     setIsCreatingPlaylist(false);
     setSelectedPlaylistId(newPl.id);
@@ -166,7 +218,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
   };
 
   // Filtered tracks for current view & search query
-  const filteredTracks = player.tracks.filter((t) => {
+  const filteredTracks = player.tracks.filter((t: GrooveTrack) => {
     const matchSearch =
       t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -175,7 +227,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
     if (!matchSearch) return false;
 
     if (activeView === 'playlists' && selectedPlaylistId) {
-      const pl = playlists.find((p) => p.id === selectedPlaylistId);
+      const pl = playlists.find((p: { id: string; name: string; trackIds: string[] }) => p.id === selectedPlaylistId);
       return pl ? pl.trackIds.includes(t.id) : true;
     }
     return true;
@@ -201,7 +253,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
             placeholder="Search music, artists, albums..."
             className="w-full bg-transparent outline-none text-zinc-200 placeholder:text-zinc-500 text-xs"
           />
@@ -329,8 +381,8 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
               <input
                 type="text"
                 value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleCreatePlaylist()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPlaylistName(e.target.value)}
+                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleCreatePlaylist()}
                 placeholder="Playlist name..."
                 autoFocus
                 className="bg-zinc-900 border border-zinc-700 text-white text-xs px-2 py-1 rounded outline-none"
@@ -352,7 +404,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
             </div>
           )}
 
-          {playlists.map((pl) => {
+          {playlists.map((pl: { id: string; name: string; trackIds: string[] }) => {
             const isSelected = activeView === 'playlists' && selectedPlaylistId === pl.id;
             return (
               <button
@@ -395,7 +447,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
                 <div className="flex-1">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400">
                     {activeView === 'playlists'
-                      ? playlists.find((p) => p.id === selectedPlaylistId)?.name || 'Playlist'
+                      ? playlists.find((p: { id: string; name: string; trackIds: string[] }) => p.id === selectedPlaylistId)?.name || 'Playlist'
                       : 'All Songs Library'}
                   </span>
                   <h2 className="text-2xl font-bold mt-1 text-white tracking-tight">
@@ -444,8 +496,8 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
                     No songs match your selection.
                   </div>
                 ) : (
-                  filteredTracks.map((t) => {
-                    const originalIdx = player.tracks.findIndex((trk) => trk.id === t.id);
+                  filteredTracks.map((t: GrooveTrack) => {
+                    const originalIdx = player.tracks.findIndex((trk: GrooveTrack) => trk.id === t.id);
                     const isSelected = originalIdx === player.currentTrackIndex;
                     return (
                       <div
@@ -478,7 +530,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
                         <span className="col-span-2 truncate text-zinc-500">{t.album}</span>
                         <div className="col-span-1 flex justify-center">
                           <button
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                               e.stopPropagation();
                               player.toggleFavorite(t.id);
                             }}
@@ -508,14 +560,14 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
             <div>
               <h2 className="text-xl font-bold mb-4 text-white">Artists</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {Array.from(new Set(player.tracks.map((t) => t.artist))).map((artistName) => {
-                  const artistTracks = player.tracks.filter((t) => t.artist === artistName);
+                {Array.from(new Set(player.tracks.map((t: GrooveTrack) => t.artist))).map((artistName: string) => {
+                  const artistTracks = player.tracks.filter((t: GrooveTrack) => t.artist === artistName);
                   const firstTrack = artistTracks[0];
                   return (
                     <div
                       key={artistName}
                       onClick={() => {
-                        const idx = player.tracks.findIndex((t) => t.artist === artistName);
+                        const idx = player.tracks.findIndex((t: GrooveTrack) => t.artist === artistName);
                         if (idx >= 0) player.playTrack(idx);
                       }}
                       className="p-4 bg-zinc-800/40 hover:bg-zinc-800 border border-zinc-700/40 rounded-xl flex flex-col items-center text-center cursor-pointer transition-all hover:scale-105 group"
@@ -546,14 +598,14 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
             <div>
               <h2 className="text-xl font-bold mb-4 text-white">Albums</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {Array.from(new Set(player.tracks.map((t) => t.album))).map((albumName) => {
-                  const albumTracks = player.tracks.filter((t) => t.album === albumName);
+                {Array.from(new Set(player.tracks.map((t: GrooveTrack) => t.album))).map((albumName: string) => {
+                  const albumTracks = player.tracks.filter((t: GrooveTrack) => t.album === albumName);
                   const firstTrack = albumTracks[0];
                   return (
                     <div
                       key={albumName}
                       onClick={() => {
-                        const idx = player.tracks.findIndex((t) => t.album === albumName);
+                        const idx = player.tracks.findIndex((t: GrooveTrack) => t.album === albumName);
                         if (idx >= 0) player.playTrack(idx);
                       }}
                       className="p-3 bg-zinc-800/40 hover:bg-zinc-800 border border-zinc-700/40 rounded-xl cursor-pointer transition-all hover:scale-105 group"
@@ -627,7 +679,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
               <div className="w-full max-w-md h-24 mt-6 flex items-center justify-center">
                 {visualizerType === 'spectrum' && (
                   <div className="flex items-end gap-1.5 h-20 w-full justify-center">
-                    {spectrumData.map((h, i) => (
+                    {spectrumData.map((h: number, i: number) => (
                       <div
                         key={i}
                         className="w-2.5 bg-gradient-to-t from-blue-600 via-indigo-400 to-cyan-300 rounded-t-xs transition-all duration-75"
@@ -645,7 +697,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
                         stroke="#38bdf8"
                         strokeWidth="3"
                         strokeLinecap="round"
-                        points={waveData.map((v, i) => `${i},${v}`).join(' ')}
+                        points={waveData.map((v: number, i: number) => `${i},${v}`).join(' ')}
                       />
                     </svg>
                   </div>
@@ -674,7 +726,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
                 <div className="flex items-center gap-1">
                   <span className="text-xs text-zinc-500 mr-2">Preset:</span>
                   <div className="flex flex-wrap gap-1">
-                    {Object.keys(EQ_PRESETS).map((p) => (
+                    {Object.keys(EQ_PRESETS).map((p: string) => (
                       <button
                         key={p}
                         onClick={() => handleApplyPreset(p)}
@@ -713,7 +765,7 @@ export const GrooveMusic: React.FC<GrooveMusicProps> = ({ player }) => {
                           max="12"
                           step="1"
                           value={gain}
-                          onChange={(e) =>
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                             handleEqualizerChange(idx, parseInt(e.target.value, 10))
                           }
                           className="h-32 w-1.5 appearance-none bg-zinc-700 rounded-lg cursor-pointer accent-blue-500"

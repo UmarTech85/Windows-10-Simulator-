@@ -43,38 +43,42 @@ class MusicGenerator {
   private onTimeUpdateCallback?: (currentTime: number, duration: number) => void;
 
   private initCtx() {
-    if (!this.ctx) {
-      const AudioCtxClass =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (AudioCtxClass) {
-        this.ctx = new AudioCtxClass();
-        this.analyser = this.ctx.createAnalyser();
-        this.analyser.fftSize = 128;
-        this.analyser.smoothingTimeConstant = 0.8;
+    try {
+      if (!this.ctx) {
+        const AudioCtxClass =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (AudioCtxClass) {
+          this.ctx = new AudioCtxClass();
+          this.analyser = this.ctx.createAnalyser();
+          this.analyser.fftSize = 128;
+          this.analyser.smoothingTimeConstant = 0.8;
 
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
+          this.masterGain = this.ctx.createGain();
+          this.masterGain.gain.setValueAtTime(this.volume, this.ctx.currentTime);
 
-        // Build 5-band EQ chain
-        let prevNode: AudioNode = this.masterGain;
-        this.eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
-          const filter = this.ctx!.createBiquadFilter();
-          filter.type = idx === 0 ? 'lowshelf' : idx === 4 ? 'highshelf' : 'peaking';
-          filter.frequency.value = freq;
-          filter.gain.value = this.eqGains[idx];
-          filter.Q.value = 1.0;
-          prevNode.connect(filter);
-          prevNode = filter;
-          return filter;
-        });
+          // Build 5-band EQ chain
+          let prevNode: AudioNode = this.masterGain;
+          this.eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
+            const filter = this.ctx!.createBiquadFilter();
+            filter.type = idx === 0 ? 'lowshelf' : idx === 4 ? 'highshelf' : 'peaking';
+            filter.frequency.value = freq;
+            filter.gain.value = this.eqGains[idx];
+            filter.Q.value = 1.0;
+            prevNode.connect(filter);
+            prevNode = filter;
+            return filter;
+          });
 
-        prevNode.connect(this.analyser);
-        this.analyser.connect(this.ctx.destination);
+          prevNode.connect(this.analyser);
+          this.analyser.connect(this.ctx.destination);
+        }
       }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume().catch(() => {});
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    } catch (err) {
+      console.warn('Web Audio music generator initialization failed or blocked:', err);
     }
   }
 

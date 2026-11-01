@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "461344985768",
+    "project_id": "windows-10-simulator-d01e3",
+    "storage_bucket": "windows-10-simulator-d01e3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461344985768:android:95de1583ebae749ca4289d",
+        "android_client_info": {
+          "package_name": "com.company.windows10simulator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsNNneAG08Dy3eZeK2XWxmV75cCq-x5Gs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

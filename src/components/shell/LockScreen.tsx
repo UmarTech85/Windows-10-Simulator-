@@ -36,6 +36,21 @@ export const LockScreen: React.FC<LockScreenProps> = ({ wallpaper, onUnlock }) =
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+        if (!isSwipedUp) {
+          setIsSwipedUp(true);
+          soundEngine.playClick();
+        } else if (e.key === 'Enter') {
+          handleUnlock();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [isSwipedUp]);
+
   const handleUnlock = () => {
     soundEngine.playStartup();
     onUnlock();
@@ -49,15 +64,17 @@ export const LockScreen: React.FC<LockScreenProps> = ({ wallpaper, onUnlock }) =
           soundEngine.playClick();
         }
       }}
-      className="fixed inset-0 z-[100] bg-cover bg-center select-none font-sans overflow-hidden flex flex-col justify-between"
-      style={{ backgroundImage: `url(${wallpaper})` }}
+      className="fixed inset-0 z-[100] bg-cover bg-center select-none font-sans overflow-hidden flex flex-col justify-between bg-[#004e92]"
+      style={{
+        backgroundImage: `url(${wallpaper}), linear-gradient(135deg, #091222 0%, #004e92 50%, #001f3f 100%)`,
+      }}
     >
       {/* Dark frosted overlay */}
       <div className={`absolute inset-0 transition-colors duration-500 ${isSwipedUp ? 'bg-black/50 backdrop-blur-md' : 'bg-black/20'}`} />
 
       {/* Screen 1: Spotlight Clock View */}
       {!isSwipedUp ? (
-        <div className="relative z-10 flex-1 flex flex-col justify-between p-12 text-white animate-fadeIn">
+        <div className="relative z-10 flex-1 flex flex-col justify-between p-8 sm:p-12 text-white animate-fadeIn">
           {/* Top Clock */}
           <div>
             <div className="text-7xl sm:text-8xl font-light tracking-tight font-mono drop-shadow-lg">
@@ -69,9 +86,21 @@ export const LockScreen: React.FC<LockScreenProps> = ({ wallpaper, onUnlock }) =
           </div>
 
           {/* Bottom Prompt + Tray Indicators */}
-          <div className="flex items-end justify-between">
-            <div className="text-xs text-white/80 animate-pulse">
-              Click anywhere or press Enter to unlock
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleUnlock();
+                }}
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md font-medium text-xs shadow-lg transition-all hover:scale-105 cursor-pointer flex items-center gap-2"
+              >
+                <span>Open Windows 10 Desktop</span>
+                <ArrowRight size={14} />
+              </button>
+              <span className="text-xs text-white/80 hidden sm:inline-block">
+                (Or click anywhere / press Enter)
+              </span>
             </div>
             <div className="flex items-center gap-4 text-white/90">
               <Wifi size={20} />

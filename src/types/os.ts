@@ -10,7 +10,8 @@ export type AppId =
   | 'photos'
   | 'groove'
   | 'taskmanager'
-  | 'recyclebin';
+  | 'recyclebin'
+  | 'dxdiag';
 
 export interface WindowState {
   id: string;

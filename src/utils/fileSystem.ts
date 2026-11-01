@@ -1,4 +1,7 @@
 import { FileItem } from '../types/os';
+import heroWallpaper from '../assets/images/win10_hero_wallpaper_1792832156235.jpg';
+import natureWallpaper from '../assets/images/win10_nature_wallpaper_1792832156468.jpg';
+import abstractWallpaper from '../assets/images/win10_abstract_wallpaper_1792832157031.jpg';
 
 const STORAGE_KEY = 'win10_virtual_fs_v1';
 
@@ -61,7 +64,7 @@ Have fun exploring and customizing your desktop!`,
     parentId: null,
     size: '2.4 MB',
     date: '2026-10-20 11:30 AM',
-    content: '/src/assets/images/win10_hero_wallpaper_1792832156235.jpg',
+    content: heroWallpaper,
   },
   {
     id: 'f-lake-pic',
@@ -72,7 +75,7 @@ Have fun exploring and customizing your desktop!`,
     parentId: null,
     size: '3.1 MB',
     date: '2026-10-21 02:45 PM',
-    content: '/src/assets/images/win10_nature_wallpaper_1792832156468.jpg',
+    content: natureWallpaper,
   },
   {
     id: 'f-abstract-pic',
@@ -83,7 +86,7 @@ Have fun exploring and customizing your desktop!`,
     parentId: null,
     size: '2.8 MB',
     date: '2026-10-22 06:10 PM',
-    content: '/src/assets/images/win10_abstract_wallpaper_1792832157031.jpg',
+    content: abstractWallpaper,
   },
   {
     id: 'f-secret-memo',

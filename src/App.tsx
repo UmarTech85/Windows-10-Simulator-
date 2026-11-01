@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 import React, { useState, useEffect } from 'react';
 import {
   AppId,
@@ -118,9 +119,9 @@ export default function App() {
     if (!appDef) return;
 
     // Check if window already exists
-    const existing = windows.find((w) => w.appId === appId);
+    const existing = windows.find((w: WindowState) => w.appId === appId);
     if (existing) {
-      setWindows((prev) =>
+      setWindows((prev: WindowState[]) =>
         prev.map((w) =>
           w.id === existing.id
             ? {
@@ -133,7 +134,7 @@ export default function App() {
         )
       );
       setActiveWindowId(existing.id);
-      setTopZIndex((z) => z + 1);
+      setTopZIndex((z: number) => z + 1);
       return;
     }
 
@@ -160,9 +161,9 @@ export default function App() {
       customData,
     };
 
-    setWindows((prev) => [...prev, newWindow]);
+    setWindows((prev: WindowState[]) => [...prev, newWindow]);
     setActiveWindowId(newWindow.id);
-    setTopZIndex((z) => z + 1);
+    setTopZIndex((z: number) => z + 1);
     soundEngine.playClick();
   };
 
@@ -190,32 +191,32 @@ export default function App() {
   // Window operations
   const handleFocusWindow = (id: string) => {
     setActiveWindowId(id);
-    setWindows((prev) =>
+    setWindows((prev: WindowState[]) =>
       prev.map((w) => (w.id === id ? { ...w, zIndex: topZIndex + 1 } : w))
     );
-    setTopZIndex((z) => z + 1);
+    setTopZIndex((z: number) => z + 1);
   };
 
   const handleCloseWindow = (id: string) => {
-    setWindows((prev) => prev.filter((w) => w.id !== id));
+    setWindows((prev: WindowState[]) => prev.filter((w) => w.id !== id));
     if (activeWindowId === id) {
-      const remaining = windows.filter((w) => w.id !== id);
+      const remaining = windows.filter((w: WindowState) => w.id !== id);
       setActiveWindowId(remaining.length > 0 ? remaining[remaining.length - 1].id : null);
     }
   };
 
   const handleMinimizeWindow = (id: string) => {
-    setWindows((prev) =>
+    setWindows((prev: WindowState[]) =>
       prev.map((w) => (w.id === id ? { ...w, isMinimized: true } : w))
     );
     if (activeWindowId === id) {
-      const visible = windows.filter((w) => w.id !== id && !w.isMinimized);
+      const visible = windows.filter((w: WindowState) => w.id !== id && !w.isMinimized);
       setActiveWindowId(visible.length > 0 ? visible[visible.length - 1].id : null);
     }
   };
 
   const handleToggleMaximize = (id: string) => {
-    setWindows((prev) =>
+    setWindows((prev: WindowState[]) =>
       prev.map((w) => {
         if (w.id !== id) return w;
         if (w.isMaximized) {
@@ -241,7 +242,7 @@ export default function App() {
     id: string,
     bounds: { x: number; y: number; width: number; height: number; snapped?: 'left' | 'right' | null }
   ) => {
-    setWindows((prev) =>
+    setWindows((prev: WindowState[]) =>
       prev.map((w) =>
         w.id === id
           ? {
@@ -259,7 +260,7 @@ export default function App() {
   };
 
   const handleUpdateTitle = (winId: string, newTitle: string) => {
-    setWindows((prev) => {
+    setWindows((prev: WindowState[]) => {
       const target = prev.find((w) => w.id === winId);
       if (!target || target.title === newTitle) return prev;
       return prev.map((w) => (w.id === winId ? { ...w, title: newTitle } : w));
@@ -268,8 +269,8 @@ export default function App() {
 
   // Peek at desktop (Aero Peek)
   const handlePeekDesktop = () => {
-    const allMinimized = windows.every((w) => w.isMinimized);
-    setWindows((prev) =>
+    const allMinimized = windows.every((w: WindowState) => w.isMinimized);
+    setWindows((prev: WindowState[]) =>
       prev.map((w) => ({
         ...w,
         isMinimized: !allMinimized,
@@ -287,7 +288,7 @@ export default function App() {
       parentId: null,
       date: new Date().toLocaleDateString(),
     };
-    setFiles((prev) => [...prev, newFolder]);
+    setFiles((prev: FileItem[]) => [...prev, newFolder]);
   };
 
   const handleCreateFile = (name: string, content: string, location: FileItem['location']) => {
@@ -303,32 +304,32 @@ export default function App() {
       parentId: null,
       date: new Date().toLocaleDateString(),
     };
-    setFiles((prev) => [...prev, newFile]);
+    setFiles((prev: FileItem[]) => [...prev, newFile]);
   };
 
   const handleDeleteItem = (fileId: string) => {
-    setFiles((prev) =>
+    setFiles((prev: FileItem[]) =>
       prev.map((f) => (f.id === fileId ? { ...f, isRecycled: true } : f))
     );
   };
 
   const handleRestoreItem = (fileId: string) => {
-    setFiles((prev) =>
+    setFiles((prev: FileItem[]) =>
       prev.map((f) => (f.id === fileId ? { ...f, isRecycled: false } : f))
     );
   };
 
   const handleRestoreAll = () => {
-    setFiles((prev) => prev.map((f) => ({ ...f, isRecycled: false })));
+    setFiles((prev: FileItem[]) => prev.map((f) => ({ ...f, isRecycled: false })));
   };
 
   const handleEmptyRecycleBin = () => {
-    setFiles((prev) => prev.filter((f) => !f.isRecycled));
+    setFiles((prev: FileItem[]) => prev.filter((f) => !f.isRecycled));
   };
 
   const handleSaveNotepadFile = (name: string, content: string, fileId?: string) => {
     if (fileId) {
-      setFiles((prev) =>
+      setFiles((prev: FileItem[]) =>
         prev.map((f) =>
           f.id === fileId
             ? { ...f, content, size: `${content.length} B`, date: new Date().toLocaleDateString() }
@@ -352,7 +353,7 @@ export default function App() {
       parentId: null,
       date: new Date().toLocaleDateString(),
     };
-    setFiles((prev) => [...prev, newArtFile]);
+    setFiles((prev: FileItem[]) => [...prev, newArtFile]);
   };
 
   const handlePowerAction = (action: 'shutdown' | 'restart' | 'sleep' | 'lock') => {
@@ -367,7 +368,7 @@ export default function App() {
   };
 
   const allPictures = files.filter(
-    (f) =>
+    (f: FileItem) =>
       (f.extension === 'jpg' || f.extension === 'png') &&
       !f.isRecycled &&
       (f.location === 'pictures' || f.location === 'desktop')
@@ -393,7 +394,7 @@ export default function App() {
       />
 
       {/* 2. Open Windows Stack */}
-      {windows.map((win) => {
+      {windows.map((win: WindowState) => {
         const isActive = activeWindowId === win.id && !win.isMinimized;
         return (
           <WindowFrame
@@ -406,7 +407,7 @@ export default function App() {
             onClose={() => handleCloseWindow(win.id)}
             onMinimize={() => handleMinimizeWindow(win.id)}
             onToggleMaximize={() => handleToggleMaximize(win.id)}
-            onUpdateBounds={(bounds) => handleUpdateBounds(win.id, bounds)}
+            onUpdateBounds={(bounds: { x: number; y: number; width: number; height: number; snapped?: 'left' | 'right' | null }) => handleUpdateBounds(win.id, bounds)}
           >
             {/* Render App Content based on appId */}
             {win.appId === 'explorer' && (
@@ -417,7 +418,7 @@ export default function App() {
                 onCreateFolder={handleCreateFolder}
                 onCreateFile={handleCreateFile}
                 onDeleteItem={handleDeleteItem}
-                onUploadFile={(uploaded) => setFiles((prev) => [...prev, uploaded])}
+                onUploadFile={(uploaded: FileItem) => setFiles((prev: FileItem[]) => [...prev, uploaded])}
               />
             )}
 
@@ -426,7 +427,7 @@ export default function App() {
                 initialFile={win.customData?.file}
                 onSave={handleSaveNotepadFile}
                 onClose={() => handleCloseWindow(win.id)}
-                updateTitle={(t) => handleUpdateTitle(win.id, t)}
+                updateTitle={(t: string) => handleUpdateTitle(win.id, t)}
               />
             )}
 
@@ -443,7 +444,12 @@ export default function App() {
               <Paint onSaveToPictures={handleSavePaintArtwork} />
             )}
 
-            {win.appId === 'edge' && <EdgeBrowser />}
+            {win.appId === 'edge' && (
+              <EdgeBrowser
+                initialUrl={win.customData?.initialUrl}
+                initialView={win.customData?.initialView}
+              />
+            )}
 
             {win.appId === 'minesweeper' && <Minesweeper />}
 
@@ -451,7 +457,7 @@ export default function App() {
               <Photos
                 initialFile={win.customData?.file}
                 allImageFiles={allPictures}
-                onSetWallpaper={(url) => setSettings((s) => ({ ...s, wallpaper: url }))}
+                onSetWallpaper={(url: string) => setSettings((s: SystemSettings) => ({ ...s, wallpaper: url }))}
                 onDelete={handleDeleteItem}
               />
             )}
@@ -468,13 +474,13 @@ export default function App() {
             {win.appId === 'settings' && (
               <Settings
                 settings={settings}
-                onUpdateSettings={(newS) => setSettings((prev) => ({ ...prev, ...newS }))}
+                onUpdateSettings={(newS: Partial<SystemSettings>) => setSettings((prev: SystemSettings) => ({ ...prev, ...newS }))}
               />
             )}
 
             {win.appId === 'recyclebin' && (
               <RecycleBin
-                recycledFiles={files.filter((f) => f.isRecycled)}
+                recycledFiles={files.filter((f: FileItem) => f.isRecycled)}
                 onRestore={handleRestoreItem}
                 onRestoreAll={handleRestoreAll}
                 onEmpty={handleEmptyRecycleBin}
@@ -488,7 +494,7 @@ export default function App() {
       {isStartOpen && (
         <StartMenu
           onLaunchApp={handleLaunchApp}
-          onOpenFolder={(loc) => handleLaunchApp('explorer', { location: loc })}
+          onOpenFolder={(loc: FileItem['location']) => handleLaunchApp('explorer', { location: loc })}
           onPowerAction={handlePowerAction}
           onClose={() => setIsStartOpen(false)}
           musicNowPlaying={{
@@ -518,8 +524,8 @@ export default function App() {
         <VolumeFlyout
           volume={settings.volume}
           muted={settings.muted}
-          onVolumeChange={(vol) => setSettings((s) => ({ ...s, volume: vol }))}
-          onToggleMute={() => setSettings((s) => ({ ...s, muted: !s.muted }))}
+          onVolumeChange={(vol: number) => setSettings((s: SystemSettings) => ({ ...s, volume: vol }))}
+          onToggleMute={() => setSettings((s: SystemSettings) => ({ ...s, muted: !s.muted }))}
         />
       )}
 
@@ -527,8 +533,8 @@ export default function App() {
         <WifiFlyout
           connected={settings.wifiConnected}
           activeNetwork={settings.networkName}
-          onToggleConnect={(net) =>
-            setSettings((s) => ({
+          onToggleConnect={(net: string) =>
+            setSettings((s: SystemSettings) => ({
               ...s,
               wifiConnected: s.networkName === net ? !s.wifiConnected : true,
               networkName: net,
@@ -542,7 +548,7 @@ export default function App() {
           notifications={notifications}
           settings={settings}
           onClearNotifications={() => setNotifications([])}
-          onUpdateSettings={(newS) => setSettings((s) => ({ ...s, ...newS }))}
+          onUpdateSettings={(newS: Partial<SystemSettings>) => setSettings((s: SystemSettings) => ({ ...s, ...newS }))}
           onLaunchApp={handleLaunchApp}
           onClose={() => setIsActionCenterOpen(false)}
         />
@@ -611,12 +617,12 @@ export default function App() {
           setIsCalendarOpen(false);
           setIsWifiOpen(false);
         }}
-        onAppClick={(appId) => handleLaunchApp(appId)}
-        onWindowClick={(win) => {
+        onAppClick={(appId: AppId) => handleLaunchApp(appId)}
+        onWindowClick={(win: WindowState) => {
           if (win.isMinimized) {
             handleFocusWindow(win.id);
-            setWindows((prev) =>
-              prev.map((w) => (w.id === win.id ? { ...w, isMinimized: false } : w))
+            setWindows((prev: WindowState[]) =>
+              prev.map((w: WindowState) => (w.id === win.id ? { ...w, isMinimized: false } : w))
             );
           } else if (activeWindowId === win.id) {
             handleMinimizeWindow(win.id);
@@ -656,7 +662,7 @@ export default function App() {
       <DesktopMediaWidget
         player={musicPlayer}
         onOpenGroove={() => handleLaunchApp('groove')}
-        isGrooveWindowOpen={windows.some((w) => w.appId === 'groove' && !w.isMinimized)}
+        isGrooveWindowOpen={windows.some((w: WindowState) => w.appId === 'groove' && !w.isMinimized)}
       />
     </div>
   );

@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import { SystemSettings } from '../../types/os';
 import { soundEngine } from '../../utils/sound';
+import heroWallpaper from '../../assets/images/win10_hero_wallpaper_1792832156235.jpg';
+import natureWallpaper from '../../assets/images/win10_nature_wallpaper_1792832156468.jpg';
+import abstractWallpaper from '../../assets/images/win10_abstract_wallpaper_1792832157031.jpg';
 
 interface SettingsProps {
   settings: SystemSettings;
@@ -24,17 +27,17 @@ export const WALLPAPER_OPTIONS = [
   {
     id: 'hero',
     name: 'Windows 10 Hero (Default)',
-    url: '/src/assets/images/win10_hero_wallpaper_1792832156235.jpg',
+    url: heroWallpaper,
   },
   {
     id: 'nature',
     name: 'Moraine Alpine Lake Spotlight',
-    url: '/src/assets/images/win10_nature_wallpaper_1792832156468.jpg',
+    url: natureWallpaper,
   },
   {
     id: 'abstract',
     name: 'Dark Abstract Ribbon',
-    url: '/src/assets/images/win10_abstract_wallpaper_1792832157031.jpg',
+    url: abstractWallpaper,
   },
 ];
 

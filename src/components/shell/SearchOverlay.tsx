@@ -23,9 +23,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
 
   const apps = Object.values(APP_REGISTRY);
 
-  const matchedApps = apps.filter((app) =>
-    app.name.toLowerCase().includes(query.toLowerCase())
-  );
+  const matchedApps = apps.filter((app) => {
+    const q = query.toLowerCase();
+    if (app.name.toLowerCase().includes(q) || app.id.toLowerCase().includes(q)) return true;
+    if (app.id === 'dxdiag' && (q.includes('dx') || q.includes('direct') || q.includes('diag') || q.includes('gpu') || q.includes('3d') || q.includes('bench'))) return true;
+    if (app.id === 'edge' && (q.includes('youtube') || q.includes('google') || q.includes('web') || q.includes('surf') || q.includes('browser'))) return true;
+    return false;
+  });
 
   const matchedFiles = files.filter((f) =>
     f.name.toLowerCase().includes(query.toLowerCase()) && !f.isRecycled

@@ -1,84 +1,166 @@
+/** @jsxRuntime classic */
+
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  ArrowLeft,
-  ArrowRight,
-  RotateCw,
-  Home,
-  Plus,
-  X,
-  Search,
-  Lock,
-  Globe,
-  Star,
-  Bookmark,
-  History,
-  Download,
-  MoreVertical,
-  BookOpen,
-  Newspaper,
-  Compass,
-  Check,
-  Trash2,
-  ExternalLink,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  Moon,
-  Sun,
-  Shield,
-  CloudSun,
-  Eye,
-  FileText,
-  Mic,
-  Camera,
-  Grid,
-  Image as ImageIcon,
-  Video as VideoIcon,
-  Play,
-  Sparkles,
-  SlidersHorizontal,
-  Share2,
-  Printer,
-  ZoomIn,
-  ZoomOut,
-  Volume2,
-  VolumeX,
-  Code2,
-  Terminal,
-  DownloadCloud,
-  HardDrive,
-  Pause,
-  AlertCircle,
-  CheckCircle2,
-  Maximize2,
-  FileCode,
-} from 'lucide-react';
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [elementName: string]: any;
+    }
+  }
+}
+
+type IconProps = React.SVGProps<SVGSVGElement> & { size?: number | string };
+
+const iconPaths: Record<string, string> = {
+  ArrowLeft: 'M19 12H5m7 7-7-7 7-7', ArrowRight: 'M5 12h14m-7-7 7 7-7 7',
+  RotateCw: 'M20 7v5h-5M20 12a8 8 0 1 1-2.34-5.66L20 9', Home: 'm3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z',
+  Plus: 'M12 5v14m-7-7h14', X: 'm18 6-12 12M6 6l12 12', Search: 'm21 21-4.34-4.34M19 10.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0',
+  Lock: 'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4', Globe: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM2 12h20m-10-10a15 15 0 0 1 0 20m0-20a15 15 0 0 0 0 20',
+  Star: 'm12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z', Bookmark: 'M6 4h12v17l-6-4-6 4z',
+  History: 'M3 12a9 9 0 1 0 2.64-6.36L3 8m0-5v5h5m4-1v5l3 2', Download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5 5 5 5-5m-5 5V3',
+  MoreVertical: 'M12 5h.01M12 12h.01M12 19h.01', BookOpen: 'M2 4.5A2.5 2.5 0 0 1 4.5 2H20v18H4.5A2.5 2.5 0 0 1 2 17.5zM2 17.5A2.5 2.5 0 0 1 4.5 15H20M8 6h7',
+  Newspaper: 'M4 4h16v16H4zM8 8h8M8 12h8m-8 4h4M2 7v12a1 1 0 0 0 1 1', Compass: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm4-14-2.5 6.5L7 17l2.5-6.5z',
+  Check: 'm5 12 4 4L19 6', Trash2: 'M3 6h18m-2 0-.9 14H5.9L5 6m4 0V4h6v2m-5 4v7m4-7v7', ExternalLink: 'M14 3h7v7m0-7L10 14m7-2v7H4V6h7',
+  ChevronRight: 'm9 18 6-6-6-6', ChevronDown: 'm6 9 6 6 6-6', ChevronUp: 'm18 15-6-6-6 6', Moon: 'M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z',
+  Sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm0-6v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42',
+  Shield: 'M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z', CloudSun: 'M12 2v2m-7.07.93 1.42 1.42M2 12h2m15-5a5 5 0 0 0-9.7-1.7A4 4 0 1 0 8 17h9a4 4 0 0 0 0-8Z',
+  Eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Zm10-3a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z', FileText: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 0v6h6M8 13h8m-8 4h8',
+  Mic: 'M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Zm-7 9a7 7 0 0 0 14 0m-7 7v4m-4 0h8', Camera: 'M3 7h4l2-3h6l2 3h4v13H3zM12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z',
+  Grid: 'M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z', ImageIcon: 'M3 3h18v18H3zM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM21 15l-5-5L5 21', VideoIcon: 'M3 6h13v12H3zM16 10l5-3v10l-5-3z',
+  Play: 'm8 5 12 7-12 7z', Sparkles: 'm12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 14l1.2 2.8L23 18l-2.8 1.2L19 22l-1.2-2.8L15 18l2.8-1.2z',
+  SlidersHorizontal: 'M4 6h16M4 12h16M4 18h16M8 4v4m8 2v4m-5 2v4', Share2: 'M18 8a3 3 0 1 0-2.83-4M6 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm12-4a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM8.6 16.5l6.8-4m0-1-6.8-4',
+  Printer: 'M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z', ZoomIn: 'm21 21-4.3-4.3M19 10.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0ZM10.5 7v7m-3.5-3.5h7', ZoomOut: 'm21 21-4.3-4.3M19 10.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0ZM7 10.5h7',
+  Volume2: 'M11 5 6 9H2v6h4l5 4zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12', VolumeX: 'M11 5 6 9H2v6h4l5 4zm5 4 5 6m0-6-5 6', Code2: 'm8 17-5-5 5-5m8 10 5-5-5-5m-2-3-4 16', Terminal: 'm4 17 6-5-6-5m8 10h8',
+  DownloadCloud: 'M20 16.5A4.5 4.5 0 0 0 18 8h-1.3A7 7 0 1 0 4 14.3M12 12v9m-4-4 4 4 4-4', HardDrive: 'M3 4h18v16H3zM3 15h18m-14 2h.01m4-.01h.01', Pause: 'M7 4h4v16H7zm6 0h4v16h-4z', AlertCircle: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-15v6m0 4h.01',
+  CheckCircle2: 'M22 11.1V12a10 10 0 1 1-5.9-9.2M22 4 12 14l-3-3', Maximize2: 'M15 3h6v6m0-6-7 7M9 21H3v-6m0 6 7-7', FileCode: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 0v6h6M8 16l2-2-2-2m4 4h3',
+};
+
+const createIcon = (name: string): React.FC<IconProps> => {
+  const Icon: React.FC<IconProps> = ({ size = 24, ...props }) =>
+    React.createElement(
+      'svg',
+      { viewBox: '0 0 24 24', width: size, height: size, fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', ...props },
+      React.createElement('path', { d: iconPaths[name] || 'M4 4h16v16H4z' }),
+    );
+  Icon.displayName = name;
+  return Icon;
+};
+
+const ArrowLeft = createIcon('ArrowLeft');
+const ArrowRight = createIcon('ArrowRight');
+const RotateCw = createIcon('RotateCw');
+const Home = createIcon('Home');
+const Plus = createIcon('Plus');
+const X = createIcon('X');
+const Search = createIcon('Search');
+const Lock = createIcon('Lock');
+const Globe = createIcon('Globe');
+const Star = createIcon('Star');
+const Bookmark = createIcon('Bookmark');
+const History = createIcon('History');
+const Download = createIcon('Download');
+const MoreVertical = createIcon('MoreVertical');
+const BookOpen = createIcon('BookOpen');
+const Newspaper = createIcon('Newspaper');
+const Compass = createIcon('Compass');
+const Check = createIcon('Check');
+const Trash2 = createIcon('Trash2');
+const ExternalLink = createIcon('ExternalLink');
+const ChevronRight = createIcon('ChevronRight');
+const ChevronDown = createIcon('ChevronDown');
+const ChevronUp = createIcon('ChevronUp');
+const Moon = createIcon('Moon');
+const Sun = createIcon('Sun');
+const Shield = createIcon('Shield');
+const CloudSun = createIcon('CloudSun');
+const Eye = createIcon('Eye');
+const FileText = createIcon('FileText');
+const Mic = createIcon('Mic');
+const Camera = createIcon('Camera');
+const Grid = createIcon('Grid');
+const ImageIcon = createIcon('ImageIcon');
+const VideoIcon = createIcon('VideoIcon');
+const Play = createIcon('Play');
+const Sparkles = createIcon('Sparkles');
+const SlidersHorizontal = createIcon('SlidersHorizontal');
+const Share2 = createIcon('Share2');
+const Printer = createIcon('Printer');
+const ZoomIn = createIcon('ZoomIn');
+const ZoomOut = createIcon('ZoomOut');
+const Volume2 = createIcon('Volume2');
+const VolumeX = createIcon('VolumeX');
+const Code2 = createIcon('Code2');
+const Terminal = createIcon('Terminal');
+const DownloadCloud = createIcon('DownloadCloud');
+const HardDrive = createIcon('HardDrive');
+const Pause = createIcon('Pause');
+const AlertCircle = createIcon('AlertCircle');
+const CheckCircle2 = createIcon('CheckCircle2');
+const Maximize2 = createIcon('Maximize2');
+const FileCode = createIcon('FileCode');
 import { soundEngine } from '../../utils/sound';
+import {
+  YouTubeIcon,
+  GmailIcon,
+  GoogleDriveIcon,
+  GoogleMapsIcon,
+  GoogleGeminiIcon,
+  GoogleTranslateIcon,
+  GoogleKeepIcon,
+} from './google/GoogleIcons';
+import { GoogleAppsWaffle } from './google/GoogleAppsWaffle';
+import { YouTubeApp } from './google/YouTubeApp';
+import { GmailApp } from './google/GmailApp';
+import { GoogleDriveApp } from './google/GoogleDriveApp';
+import { GoogleMapsApp } from './google/GoogleMapsApp';
+import { GoogleGeminiApp } from './google/GoogleGeminiApp';
+import { GoogleTranslateApp } from './google/GoogleTranslateApp';
+import { GoogleKeepApp } from './google/GoogleKeepApp';
+import { GoogleServicesHub } from './google/GoogleServicesHub';
+import { GoogleAccountModal } from './google/GoogleAccountModal';
+
+export type BrowserViewType =
+  | 'start'
+  | 'wiki'
+  | 'game'
+  | 'surf'
+  | 'search'
+  | 'history'
+  | 'downloads'
+  | 'google'
+  | 'googleSearch'
+  | 'youtube'
+  | 'gmail'
+  | 'drive'
+  | 'maps'
+  | 'gemini'
+  | 'translate'
+  | 'keep'
+  | 'googleServices'
+  | 'embed';
 
 interface Tab {
   id: string;
   title: string;
   url: string;
-  view:
-    | 'start'
-    | 'wiki'
-    | 'game'
-    | 'surf'
-    | 'search'
-    | 'history'
-    | 'downloads'
-    | 'google'
-    | 'googleSearch'
-    | 'embed';
+  view: BrowserViewType;
   inPrivate?: boolean;
 }
 
 const isGoogleDomainUrl = (url: string) => {
   try {
     const hostname = new URL(url).hostname;
-    return hostname === 'google.com' || hostname.endsWith('.google.com');
+    return (
+      hostname === 'google.com' ||
+      hostname.endsWith('.google.com') ||
+      hostname === 'youtube.com' ||
+      hostname.endsWith('.youtube.com') ||
+      hostname === 'youtu.be' ||
+      hostname === 'gmail.com'
+    );
   } catch {
-    return false;
+    return url.startsWith('google:') || url.startsWith('edge://google');
   }
 };
 
@@ -153,6 +235,7 @@ interface BookmarkItem {
   title: string;
   url: string;
   icon: string;
+  view?: BrowserViewType;
 }
 
 interface HistoryEntry {
@@ -162,31 +245,32 @@ interface HistoryEntry {
   time: string;
 }
 
-export const GoogleGIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
-  <svg viewBox="0 0 24 24" className={className} aria-label="Google">
-    <path
-      fill="#4285F4"
-      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.03h3.88c2.27-2.09 3.66-5.17 3.66-9.12z"
-    />
-    <path
-      fill="#34A853"
-      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.03c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.13C3.25 21.3 7.31 24 12 24z"
-    />
-    <path
-      fill="#FBBC05"
-      d="M5.28 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.58H1.27C.46 8.2 0 10.05 0 12s.46 3.8 1.27 5.42l4.01-3.13z"
-    />
-    <path
-      fill="#EA4335"
-      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.58l4.01 3.13c.95-2.83 3.6-4.96 6.72-4.96z"
-    />
-  </svg>
-);
+export const GoogleGIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) =>
+  React.createElement(
+    'svg',
+    { viewBox: '0 0 24 24', className, 'aria-label': 'Google' },
+    React.createElement('path', {
+      fill: '#4285F4',
+      d: 'M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.03h3.88c2.27-2.09 3.66-5.17 3.66-9.12z',
+    }),
+    React.createElement('path', {
+      fill: '#34A853',
+      d: 'M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.03c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.27v3.13C3.25 21.3 7.31 24 12 24z',
+    }),
+    React.createElement('path', {
+      fill: '#FBBC05',
+      d: 'M5.28 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.58H1.27C.46 8.2 0 10.05 0 12s.46 3.8 1.27 5.42l4.01-3.13z',
+    }),
+    React.createElement('path', {
+      fill: '#EA4335',
+      d: 'M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.58l4.01 3.13c.95-2.83 3.6-4.96 6.72-4.96z',
+    }),
+  );
 
 export const GoogleWordmark: React.FC<{ size?: 'sm' | 'md' | 'lg'; onClick?: () => void }> = ({
   size = 'md',
   onClick,
-}) => {
+}: { size?: 'sm' | 'md' | 'lg'; onClick?: () => void }) => {
   const sizeClasses =
     size === 'sm'
       ? 'text-xl tracking-tight'
@@ -211,11 +295,15 @@ export const GoogleWordmark: React.FC<{ size?: 'sm' | 'md' | 'lg'; onClick?: () 
 
 const INITIAL_BOOKMARKS: BookmarkItem[] = [
   { id: 'bm-google', title: 'Google', url: 'https://www.google.com', icon: 'google' },
-  { id: 'bm-1', title: 'MSN Feed', url: 'edge://newtab', icon: 'newspaper' },
+  { id: 'bm-yt', title: 'YouTube', url: 'https://www.youtube.com', icon: 'youtube' },
+  { id: 'bm-gmail', title: 'Gmail', url: 'https://mail.google.com', icon: 'gmail' },
+  { id: 'bm-drive', title: 'Drive', url: 'https://drive.google.com', icon: 'drive' },
+  { id: 'bm-maps', title: 'Maps', url: 'https://maps.google.com', icon: 'maps' },
+  { id: 'bm-gemini', title: 'Gemini AI', url: 'https://gemini.google.com', icon: 'gemini' },
+  { id: 'bm-services', title: 'Google Services', url: 'edge://google-services', icon: 'googleServices' },
   { id: 'bm-2', title: 'Edge Surf', url: 'edge://surf', icon: 'game' },
   { id: 'bm-3', title: 'Wikipedia', url: 'https://en.wikipedia.org', icon: 'wiki' },
-  { id: 'bm-4', title: 'Bing Search', url: 'https://bing.com', icon: 'search' },
-  { id: 'bm-5', title: 'Snake Arcade', url: 'edge://arcade/snake', icon: 'game' },
+  { id: 'bm-1', title: 'MSN Feed', url: 'edge://newtab', icon: 'newspaper' },
 ];
 
 interface KnowledgeItem {
@@ -478,14 +566,53 @@ const WIKI_ARTICLES: Record<string, { title: string; category: string; summary: 
   },
 };
 
-export const EdgeBrowser: React.FC = () => {
+interface EdgeBrowserProps {
+  initialUrl?: string;
+  initialView?: BrowserViewType;
+}
+
+export const EdgeBrowser: React.FC<EdgeBrowserProps> = ({
+  initialUrl,
+  initialView,
+}) => {
   const [tabs, setTabs] = useState<Tab[]>([
-    { id: 'tab-1', title: 'New Tab', url: 'edge://newtab', view: 'start' },
+    {
+      id: 'tab-1',
+      title: initialUrl
+        ? initialUrl.includes('youtube')
+          ? 'YouTube'
+          : initialUrl.includes('google-services')
+          ? 'Google Services'
+          : initialUrl.includes('google')
+          ? 'Google'
+          : 'Browser'
+        : 'New Tab',
+      url: initialUrl || 'edge://newtab',
+      view:
+        initialView ||
+        (initialUrl?.includes('youtube')
+          ? 'youtube'
+          : initialUrl?.includes('mail.google') || initialUrl?.includes('gmail')
+          ? 'gmail'
+          : initialUrl?.includes('drive.google')
+          ? 'drive'
+          : initialUrl?.includes('maps.google')
+          ? 'maps'
+          : initialUrl?.includes('gemini.google')
+          ? 'gemini'
+          : initialUrl?.includes('google-services')
+          ? 'googleServices'
+          : initialUrl?.includes('google')
+          ? 'google'
+          : 'start'),
+    },
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab-1');
-  const [inputUrl, setInputUrl] = useState<string>('edge://newtab');
+  const [inputUrl, setInputUrl] = useState<string>(initialUrl || 'edge://newtab');
   const [selectedWiki, setSelectedWiki] = useState<string>('windows-10');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showGoogleWaffleMenu, setShowGoogleWaffleMenu] = useState<boolean>(false);
+  const [showGoogleAccountModal, setShowGoogleAccountModal] = useState<boolean>(false);
 
   // 1. Real LocalStorage-backed Bookmarks
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(() => {
@@ -668,8 +795,8 @@ export const EdgeBrowser: React.FC = () => {
     running: false,
   });
 
-  const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0];
-  const isBookmarked = bookmarks.some((b) => b.url === activeTab.url);
+  const activeTab = tabs.find((t: Tab) => t.id === activeTabId) || tabs[0];
+  const isBookmarked = bookmarks.some((b: BookmarkItem) => b.url === activeTab.url);
 
   // Live Clock Tick
   useEffect(() => {
@@ -698,19 +825,19 @@ export const EdgeBrowser: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {
         e.preventDefault();
-        setShowFindBar((prev) => !prev);
+        setShowFindBar((prev: boolean) => !prev);
       } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
         e.preventDefault();
         window.print();
       } else if (e.key === 'F12') {
         e.preventDefault();
-        setShowDevTools((prev) => !prev);
+        setShowDevTools((prev: boolean) => !prev);
       } else if ((e.ctrlKey || e.metaKey) && e.key === '=') {
         e.preventDefault();
-        setPageZoom((prev) => Math.min(200, prev + 10));
+        setPageZoom((prev: number) => Math.min(200, prev + 10));
       } else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
         e.preventDefault();
-        setPageZoom((prev) => Math.max(50, prev - 10));
+        setPageZoom((prev: number) => Math.max(50, prev - 10));
       } else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
         e.preventDefault();
         setPageZoom(100);
@@ -727,10 +854,10 @@ export const EdgeBrowser: React.FC = () => {
       url,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
-    setHistoryList((prev) => [entry, ...prev.slice(0, 30)]);
+    setHistoryList((prev: HistoryEntry[]) => [entry, ...prev.slice(0, 30)]);
 
     // Log in DevTools Network
-    setNetworkLogs((prev) => [
+    setNetworkLogs((prev: NetworkEntry[]) => [
       {
         id: `net-${Date.now()}`,
         url,
@@ -764,7 +891,7 @@ export const EdgeBrowser: React.FC = () => {
     e.stopPropagation();
     soundEngine.playClick();
     if (tabs.length === 1) return;
-    const remaining = tabs.filter((t) => t.id !== tabId);
+    const remaining = tabs.filter((t: Tab) => t.id !== tabId);
     setTabs(remaining);
     if (activeTabId === tabId) {
       setActiveTabId(remaining[remaining.length - 1].id);
@@ -774,7 +901,7 @@ export const EdgeBrowser: React.FC = () => {
 
   const navigateTo = (view: Tab['view'], url: string, title: string) => {
     soundEngine.playClick();
-    setTabs((prev) =>
+    setTabs((prev: Tab[]) =>
       prev.map((t) => (t.id === activeTabId ? { ...t, view, url, title } : t))
     );
     setInputUrl(url);
@@ -880,7 +1007,7 @@ export const EdgeBrowser: React.FC = () => {
       blobUrl: url,
       category,
     };
-    setDownloads((prev) => [newDl, ...prev]);
+    setDownloads((prev: DownloadItem[]) => [newDl, ...prev]);
   };
 
   const handleSavePageAsHtml = () => {
@@ -970,7 +1097,7 @@ export const EdgeBrowser: React.FC = () => {
         text: typeof result === 'object' ? JSON.stringify(result, null, 2) : String(result),
         time: new Date().toLocaleTimeString(),
       };
-      setConsoleLogs((prev) => [...prev, inputEntry, outEntry]);
+      setConsoleLogs((prev: ConsoleEntry[]) => [...prev, inputEntry, outEntry]);
     } catch (err: any) {
       const errEntry: ConsoleEntry = {
         id: `c-${Date.now() + 1}`,
@@ -978,7 +1105,7 @@ export const EdgeBrowser: React.FC = () => {
         text: `Uncaught ${err?.name || 'Error'}: ${err?.message || String(err)}`,
         time: new Date().toLocaleTimeString(),
       };
-      setConsoleLogs((prev) => [...prev, inputEntry, errEntry]);
+      setConsoleLogs((prev: ConsoleEntry[]) => [...prev, inputEntry, errEntry]);
     }
     setConsoleInput('');
   };
@@ -997,6 +1124,71 @@ export const EdgeBrowser: React.FC = () => {
       navigateTo('downloads', 'edge://downloads', 'Downloads');
     } else if (lower === 'edge://inspect' || lower === 'edge://devtools') {
       setShowDevTools(true);
+    } else if (
+      lower === 'youtube' ||
+      lower === 'youtube.com' ||
+      lower === 'www.youtube.com' ||
+      lower === 'm.youtube.com' ||
+      lower === 'https://www.youtube.com' ||
+      lower === 'http://www.youtube.com' ||
+      lower === 'https://youtube.com' ||
+      lower.startsWith('https://www.youtube.com') ||
+      lower.startsWith('https://youtube.com') ||
+      lower.startsWith('https://youtu.be')
+    ) {
+      navigateTo('youtube', 'https://www.youtube.com', 'YouTube');
+    } else if (
+      lower === 'gmail' ||
+      lower === 'gmail.com' ||
+      lower === 'www.gmail.com' ||
+      lower === 'mail.google.com' ||
+      lower === 'https://mail.google.com' ||
+      lower.startsWith('https://mail.google.com')
+    ) {
+      navigateTo('gmail', 'https://mail.google.com', 'Gmail');
+    } else if (
+      lower === 'drive' ||
+      lower === 'drive.google.com' ||
+      lower === 'https://drive.google.com' ||
+      lower.startsWith('https://drive.google.com')
+    ) {
+      navigateTo('drive', 'https://drive.google.com', 'Google Drive');
+    } else if (
+      lower === 'maps' ||
+      lower === 'maps.google.com' ||
+      lower === 'https://maps.google.com' ||
+      lower.startsWith('https://maps.google.com')
+    ) {
+      navigateTo('maps', 'https://maps.google.com', 'Google Maps');
+    } else if (
+      lower === 'gemini' ||
+      lower === 'gemini.google.com' ||
+      lower === 'bard.google.com' ||
+      lower === 'https://gemini.google.com' ||
+      lower.startsWith('https://gemini.google.com')
+    ) {
+      navigateTo('gemini', 'https://gemini.google.com', 'Google Gemini');
+    } else if (
+      lower === 'translate' ||
+      lower === 'translate.google.com' ||
+      lower === 'https://translate.google.com' ||
+      lower.startsWith('https://translate.google.com')
+    ) {
+      navigateTo('translate', 'https://translate.google.com', 'Google Translate');
+    } else if (
+      lower === 'keep' ||
+      lower === 'keep.google.com' ||
+      lower === 'https://keep.google.com' ||
+      lower.startsWith('https://keep.google.com')
+    ) {
+      navigateTo('keep', 'https://keep.google.com', 'Google Keep');
+    } else if (
+      lower === 'google-services' ||
+      lower === 'edge://google-services' ||
+      lower === 'edge://google' ||
+      lower === 'google:services'
+    ) {
+      navigateTo('googleServices', 'edge://google-services', 'Google Services Config');
     } else if (
       lower === 'google' ||
       lower === 'google.com' ||
@@ -1057,7 +1249,7 @@ export const EdgeBrowser: React.FC = () => {
   const toggleBookmarkCurrent = () => {
     soundEngine.playClick();
     if (isBookmarked) {
-      setBookmarks((prev) => prev.filter((b) => b.url !== activeTab.url));
+      setBookmarks((prev: BookmarkItem[]) => prev.filter((b) => b.url !== activeTab.url));
     } else {
       const newBm: BookmarkItem = {
         id: `bm-${Date.now()}`,
@@ -1065,7 +1257,7 @@ export const EdgeBrowser: React.FC = () => {
         url: activeTab.url,
         icon: activeTab.view,
       };
-      setBookmarks((prev) => [...prev, newBm]);
+      setBookmarks((prev: BookmarkItem[]) => [...prev, newBm]);
     }
   };
 
@@ -1130,7 +1322,7 @@ export const EdgeBrowser: React.FC = () => {
         setSurfDistance(Math.floor(state.distance / 10));
 
         // Move obstacles upwards (surfer moving down)
-        state.obstacles.forEach((obs) => {
+        state.obstacles.forEach((obs: { x: number; y: number; type: 'rock' | 'buoy' | 'whirlpool'; radius: number }) => {
           obs.y -= state.speed;
         });
 
@@ -1143,10 +1335,10 @@ export const EdgeBrowser: React.FC = () => {
             radius: 12,
           });
         }
-        state.obstacles = state.obstacles.filter((obs) => obs.y > -30);
+        state.obstacles = state.obstacles.filter((obs: { x: number; y: number; type: 'rock' | 'buoy' | 'whirlpool'; radius: number }) => obs.y > -30);
 
         // Move & spawn boosters
-        state.boosters.forEach((b) => {
+        state.boosters.forEach((b: { x: number; y: number; radius: number }) => {
           b.y -= state.speed;
         });
         if (state.boosters.length < 2 && Math.random() < 0.02) {
@@ -1156,10 +1348,10 @@ export const EdgeBrowser: React.FC = () => {
             radius: 10,
           });
         }
-        state.boosters = state.boosters.filter((b) => b.y > -20);
+        state.boosters = state.boosters.filter((b: { x: number; y: number; radius: number }) => b.y > -20);
 
         // Draw Boosters
-        state.boosters.forEach((b) => {
+        state.boosters.forEach((b: { x: number; y: number; radius: number }) => {
           ctx.fillStyle = '#f59e0b';
           ctx.beginPath();
           ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
@@ -1175,11 +1367,11 @@ export const EdgeBrowser: React.FC = () => {
             state.speed = Math.min(9, state.speed + 1.5);
             soundEngine.playDing();
             b.y = -999;
-          }
+         }
         });
 
         // Draw Obstacles
-        state.obstacles.forEach((obs) => {
+        state.obstacles.forEach((obs: { x: number; y: number; type: 'rock' | 'buoy' | 'whirlpool'; radius: number }) => {
           if (obs.type === 'rock') {
             ctx.fillStyle = '#52525b';
             ctx.beginPath();
@@ -1265,7 +1457,7 @@ export const EdgeBrowser: React.FC = () => {
     if (activeTab.view !== 'game' || !isSnakeRunning || isSnakeOver) return;
 
     const timer = setInterval(() => {
-      setSnake((prevSnake) => {
+      setSnake((prevSnake: [number, number][]) => {
         const head = prevSnake[0];
         let newHead: [number, number] = [head[0], head[1]];
 
@@ -1281,7 +1473,7 @@ export const EdgeBrowser: React.FC = () => {
           return prevSnake;
         }
 
-        if (prevSnake.some((seg) => seg[0] === newHead[0] && seg[1] === newHead[1])) {
+        if (prevSnake.some((seg: [number, number]) => seg[0] === newHead[0] && seg[1] === newHead[1])) {
           setIsSnakeOver(true);
           soundEngine.playDing();
           return prevSnake;
@@ -1290,7 +1482,7 @@ export const EdgeBrowser: React.FC = () => {
         const next = [newHead, ...prevSnake];
 
         if (newHead[0] === food[0] && newHead[1] === food[1]) {
-          setSnakeScore((s) => s + 10);
+          setSnakeScore((s: number) => s + 10);
           soundEngine.playClick();
           setFood([Math.floor(Math.random() * 15), Math.floor(Math.random() * 20)]);
         } else {
@@ -1319,7 +1511,7 @@ export const EdgeBrowser: React.FC = () => {
             : 'bg-[#e5e5e5] border-zinc-300'
         }`}
       >
-        {tabs.map((tab) => {
+        {tabs.map((tab: Tab) => {
           const isActive = tab.id === activeTabId;
           return (
             <div
@@ -1339,7 +1531,21 @@ export const EdgeBrowser: React.FC = () => {
                   : 'bg-transparent text-zinc-600 hover:bg-zinc-200 border-transparent'
               }`}
             >
-              {tab.view === 'google' || tab.view === 'googleSearch' || isGoogleDomainUrl(tab.url) ? (
+              {tab.view === 'youtube' ? (
+                <YouTubeIcon size={14} className="shrink-0 text-red-600" />
+              ) : tab.view === 'gmail' ? (
+                <GmailIcon size={14} className="shrink-0" />
+              ) : tab.view === 'drive' ? (
+                <GoogleDriveIcon size={14} className="shrink-0" />
+              ) : tab.view === 'maps' ? (
+                <GoogleMapsIcon size={14} className="shrink-0" />
+              ) : tab.view === 'gemini' ? (
+                <GoogleGeminiIcon size={14} className="shrink-0" />
+              ) : tab.view === 'translate' ? (
+                <GoogleTranslateIcon size={14} className="shrink-0" />
+              ) : tab.view === 'keep' ? (
+                <GoogleKeepIcon size={14} className="shrink-0" />
+              ) : tab.view === 'google' || tab.view === 'googleSearch' || tab.view === 'googleServices' || isGoogleDomainUrl(tab.url) ? (
                 <GoogleGIcon className="w-3.5 h-3.5 shrink-0" />
               ) : tab.inPrivate ? (
                 <Shield size={12} className="text-purple-400 shrink-0" />
@@ -1349,7 +1555,7 @@ export const EdgeBrowser: React.FC = () => {
               <span className="truncate flex-1">{tab.title}</span>
               {tabs.length > 1 && (
                 <button
-                  onClick={(e) => handleCloseTab(e, tab.id)}
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleCloseTab(e, tab.id)}
                   className="opacity-0 group-hover:opacity-100 p-0.5 rounded-full hover:bg-zinc-200/50 text-zinc-500"
                 >
                   <X size={12} />
@@ -1423,7 +1629,7 @@ export const EdgeBrowser: React.FC = () => {
             <input
               type="text"
               value={inputUrl}
-              onChange={(e) => setInputUrl(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputUrl(e.target.value)}
               className="w-full bg-transparent outline-none text-inherit text-xs"
               placeholder="Search or enter web address (e.g. google.com, https://example.com, edge://surf)"
             />
@@ -1508,12 +1714,41 @@ export const EdgeBrowser: React.FC = () => {
           >
             <Code2 size={15} />
           </button>
+
+          {/* Google Apps & Services 9-dot Waffle Button */}
+          <div className="relative">
+            <button
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                e.stopPropagation();
+                setShowGoogleWaffleMenu(!showGoogleWaffleMenu);
+              }}
+              title="Google Apps & Services (YouTube, Gmail, Drive, Maps, Gemini)"
+              className={`p-1 rounded transition-colors flex items-center justify-center ${
+                showGoogleWaffleMenu
+                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                  : 'hover:bg-zinc-100 text-zinc-600 dark:hover:bg-zinc-800 dark:text-zinc-300'
+              }`}
+            >
+              <Grid size={15} />
+            </button>
+
+            {showGoogleWaffleMenu && (
+              <GoogleAppsWaffle
+                onNavigate={navigateTo}
+                onClose={() => setShowGoogleWaffleMenu(false)}
+                onOpenAccountModal={() => {
+                  setShowGoogleWaffleMenu(false);
+                  setShowGoogleAccountModal(true);
+                }}
+              />
+            )}
+          </div>
         </div>
 
         {/* Three Dots Menu Button */}
         <div className="relative">
           <button
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               e.stopPropagation();
               setIsMenuOpen(!isMenuOpen);
             }}
@@ -1526,7 +1761,7 @@ export const EdgeBrowser: React.FC = () => {
           {/* Settings / Options Dropdown with Real Functions */}
           {isMenuOpen && (
             <div
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}
               className="absolute right-0 top-full mt-1 w-64 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-xl py-1.5 z-50 text-xs text-zinc-800 dark:text-zinc-200 font-sans"
             >
               <button
@@ -1557,14 +1792,14 @@ export const EdgeBrowser: React.FC = () => {
                 <span className="text-zinc-500 dark:text-zinc-400">Zoom</span>
                 <div className="flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-lg border border-zinc-200 dark:border-zinc-700">
                   <button
-                    onClick={() => setPageZoom((z) => Math.max(50, z - 10))}
+                    onClick={() => setPageZoom((z: number) => Math.max(50, z - 10))}
                     className="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded font-bold"
                   >
                     -
                   </button>
                   <span className="font-mono text-[11px] min-w-9 text-center">{pageZoom}%</span>
                   <button
-                    onClick={() => setPageZoom((z) => Math.min(200, z + 10))}
+                    onClick={() => setPageZoom((z: number) => Math.min(200, z + 10))}
                     className="p-0.5 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded font-bold"
                   >
                     +
@@ -1724,11 +1959,23 @@ export const EdgeBrowser: React.FC = () => {
               : 'bg-[#fafafa] border-zinc-200 text-zinc-700'
           }`}
         >
-          {bookmarks.map((bm) => (
+          {bookmarks.map((bm: BookmarkItem) => (
             <button
               key={bm.id}
               onClick={() => {
-                if (bm.url.includes('google') || bm.icon === 'google') {
+                if (bm.view === 'youtube' || bm.url.includes('youtube')) {
+                  navigateTo('youtube', 'https://www.youtube.com', 'YouTube');
+                } else if (bm.view === 'gmail' || bm.url.includes('mail.google')) {
+                  navigateTo('gmail', 'https://mail.google.com', 'Gmail');
+                } else if (bm.view === 'drive' || bm.url.includes('drive.google')) {
+                  navigateTo('drive', 'https://drive.google.com', 'Google Drive');
+                } else if (bm.view === 'maps' || bm.url.includes('maps.google')) {
+                  navigateTo('maps', 'https://maps.google.com', 'Google Maps');
+                } else if (bm.view === 'gemini' || bm.url.includes('gemini.google')) {
+                  navigateTo('gemini', 'https://gemini.google.com', 'Google Gemini');
+                } else if (bm.view === 'googleServices' || bm.url.includes('google-services')) {
+                  navigateTo('googleServices', 'edge://google-services', 'Google Services Config');
+                } else if (bm.url.includes('google') || bm.icon === 'google') {
                   navigateTo('google', 'https://www.google.com', 'Google');
                 } else if (bm.url === 'edge://surf') {
                   navigateTo('surf', 'edge://surf', 'Edge Surf');
@@ -1745,7 +1992,17 @@ export const EdgeBrowser: React.FC = () => {
               }}
               className="flex items-center gap-1.5 px-2 py-0.5 hover:bg-zinc-200/60 rounded transition-colors shrink-0"
             >
-              {bm.url.includes('google') || bm.icon === 'google' ? (
+              {bm.url.includes('youtube') || bm.icon === 'youtube' ? (
+                <YouTubeIcon size={13} className="shrink-0 text-red-600" />
+              ) : bm.url.includes('mail') || bm.icon === 'gmail' ? (
+                <GmailIcon size={13} className="shrink-0" />
+              ) : bm.url.includes('drive') || bm.icon === 'drive' ? (
+                <GoogleDriveIcon size={13} className="shrink-0" />
+              ) : bm.url.includes('maps') || bm.icon === 'maps' ? (
+                <GoogleMapsIcon size={13} className="shrink-0" />
+              ) : bm.url.includes('gemini') || bm.icon === 'gemini' ? (
+                <GoogleGeminiIcon size={13} className="shrink-0" />
+              ) : bm.url.includes('google') || bm.icon === 'google' || bm.icon === 'googleServices' ? (
                 <GoogleGIcon className="w-3.5 h-3.5 shrink-0" />
               ) : bm.url === 'edge://surf' ? (
                 <span>🏄</span>
@@ -1796,13 +2053,13 @@ export const EdgeBrowser: React.FC = () => {
             {availableVoices.length > 0 && (
               <select
                 value={selectedVoiceIndex}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   setSelectedVoiceIndex(Number(e.target.value));
                   startReadAloud();
                 }}
                 className="bg-black/20 text-white rounded px-2 py-1 text-[11px] outline-none max-w-36 truncate"
               >
-                {availableVoices.map((v, idx) => (
+                {availableVoices.map((v: SpeechSynthesisVoice, idx: number) => (
                   <option key={idx} value={idx} className="text-zinc-900">
                     {v.name}
                   </option>
@@ -1827,7 +2084,7 @@ export const EdgeBrowser: React.FC = () => {
           <input
             type="text"
             value={findQuery}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setFindQuery(e.target.value);
               if (e.target.value) {
                 setFindMatchesCount(Math.floor(Math.random() * 5 + 1));
@@ -1847,13 +2104,13 @@ export const EdgeBrowser: React.FC = () => {
             </span>
           )}
           <button
-            onClick={() => setCurrentMatchIndex((i) => (i > 1 ? i - 1 : findMatchesCount))}
+            onClick={() => setCurrentMatchIndex((i: number) => (i > 1 ? i - 1 : findMatchesCount))}
             className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded text-zinc-500"
           >
             <ChevronUp size={14} />
           </button>
           <button
-            onClick={() => setCurrentMatchIndex((i) => (i < findMatchesCount ? i + 1 : 1))}
+            onClick={() => setCurrentMatchIndex((i: number) => (i < findMatchesCount ? i + 1 : 1))}
             className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 rounded text-zinc-500"
           >
             <ChevronDown size={14} />
@@ -1902,7 +2159,7 @@ export const EdgeBrowser: React.FC = () => {
               <p className="text-xs text-zinc-500">World-class speed, privacy, and built-in experiences</p>
             </div>
 
-            {/* Quick Tile Bookmarks */}
+            {/* Quick Tile Bookmarks including Google Services */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
               <button
                 onClick={() => navigateTo('google', 'https://www.google.com', 'Google')}
@@ -1914,6 +2171,84 @@ export const EdgeBrowser: React.FC = () => {
                 <div>
                   <div className="text-xs font-semibold group-hover:text-blue-600 transition-colors">Google</div>
                   <div className="text-[10px] text-zinc-400">Search engine</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigateTo('youtube', 'https://www.youtube.com', 'YouTube')}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-red-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center shrink-0">
+                  <YouTubeIcon size={20} className="text-red-600" />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold group-hover:text-red-600 transition-colors">YouTube</div>
+                  <div className="text-[10px] text-zinc-400">Videos & streams</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigateTo('gmail', 'https://mail.google.com', 'Gmail')}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-red-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/40 flex items-center justify-center shrink-0">
+                  <GmailIcon size={18} />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold group-hover:text-red-600 transition-colors">Gmail</div>
+                  <div className="text-[10px] text-zinc-400">Webmail inbox</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigateTo('drive', 'https://drive.google.com', 'Google Drive')}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-amber-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center shrink-0">
+                  <GoogleDriveIcon size={18} />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold group-hover:text-amber-600 transition-colors">Drive</div>
+                  <div className="text-[10px] text-zinc-400">Cloud files</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigateTo('maps', 'https://maps.google.com', 'Google Maps')}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-emerald-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                  <GoogleMapsIcon size={18} />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold group-hover:text-emerald-600 transition-colors">Maps</div>
+                  <div className="text-[10px] text-zinc-400">Navigation</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigateTo('gemini', 'https://gemini.google.com', 'Google Gemini')}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-indigo-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center shrink-0">
+                  <GoogleGeminiIcon size={18} />
+                </div>
+                <div>
+                  <div className="text-xs font-semibold group-hover:text-indigo-600 transition-colors">Gemini AI</div>
+                  <div className="text-[10px] text-zinc-400">Smart assistant</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => navigateTo('googleServices', 'edge://google-services', 'Google Services Config')}
+                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-blue-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">
+                  ⚙️
+                </div>
+                <div>
+                  <div className="text-xs font-semibold group-hover:text-blue-600 transition-colors">Services Hub</div>
+                  <div className="text-[10px] text-zinc-400">Firebase sync</div>
                 </div>
               </button>
 
@@ -1953,22 +2288,6 @@ export const EdgeBrowser: React.FC = () => {
                 <div>
                   <div className="text-xs font-semibold">Snake Arcade</div>
                   <div className="text-[10px] text-zinc-400">Retro game</div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => {
-                  setSearchQuery('technology');
-                  navigateTo('search', 'https://bing.com/search?q=technology', 'Tech News');
-                }}
-                className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-800/80 hover:bg-amber-50 border border-zinc-200 dark:border-zinc-700 rounded-xl transition-all hover:scale-105 shadow-xs text-left"
-              >
-                <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
-                  <Newspaper size={18} />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold">Top News</div>
-                  <div className="text-[10px] text-zinc-400">Curated feed</div>
                 </div>
               </button>
             </div>
@@ -2157,13 +2476,13 @@ export const EdgeBrowser: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span>Size:</span>
                   <button
-                    onClick={() => setReadingFontSize((s) => Math.max(12, s - 2))}
+                    onClick={() => setReadingFontSize((s: number) => Math.max(12, s - 2))}
                     className="px-2 py-0.5 bg-black/10 rounded"
                   >
                     A-
                   </button>
                   <button
-                    onClick={() => setReadingFontSize((s) => Math.min(24, s + 2))}
+                    onClick={() => setReadingFontSize((s: number) => Math.min(24, s + 2))}
                     className="px-2 py-0.5 bg-black/10 rounded"
                   >
                     A+
@@ -2176,7 +2495,7 @@ export const EdgeBrowser: React.FC = () => {
               {/* Live Wikipedia Search Bar */}
               <div className="mb-6 flex gap-2">
                 <form
-                  onSubmit={(e) => {
+                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                     e.preventDefault();
                     if (wikiSearchInput.trim()) {
                       fetchLiveWikiArticle(wikiSearchInput.trim());
@@ -2188,7 +2507,7 @@ export const EdgeBrowser: React.FC = () => {
                   <input
                     type="text"
                     value={wikiSearchInput}
-                    onChange={(e) => setWikiSearchInput(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setWikiSearchInput(e.target.value)}
                     placeholder="Search any Wikipedia article in real-time (e.g. Apollo program, Linux, Quantum computing)..."
                     className="w-full bg-transparent outline-none text-xs text-inherit placeholder-zinc-400"
                   />
@@ -2389,7 +2708,7 @@ export const EdgeBrowser: React.FC = () => {
               {Array.from({ length: 15 * 20 }).map((_, i) => {
                 const r = Math.floor(i / 20);
                 const c = i % 20;
-                const isSnake = snake.some((s) => s[0] === r && s[1] === c);
+                const isSnake = snake.some((s: [number, number]) => s[0] === r && s[1] === c);
                 const isHead = snake[0][0] === r && snake[0][1] === c;
                 const isFoodCell = food[0] === r && food[1] === c;
 
@@ -2495,7 +2814,7 @@ export const EdgeBrowser: React.FC = () => {
               <p className="text-xs text-zinc-400 text-center py-12">No history recorded.</p>
             ) : (
               <div className="space-y-1">
-                {historyList.map((h) => (
+                {historyList.map((h: HistoryEntry) => (
                   <div
                     key={h.id}
                     onClick={() => {
@@ -2543,7 +2862,7 @@ export const EdgeBrowser: React.FC = () => {
 
               <div className="flex items-center gap-4 text-zinc-700 dark:text-zinc-300 relative">
                 <button
-                  onClick={() => handleGoogleSearch('Gmail inbox')}
+                  onClick={() => navigateTo('gmail', 'https://mail.google.com', 'Gmail')}
                   className="hover:underline text-xs"
                 >
                   Gmail
@@ -2560,7 +2879,7 @@ export const EdgeBrowser: React.FC = () => {
 
                 {/* 9-dot Google Apps Waffle Button */}
                 <button
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     setShowGoogleApps(!showGoogleApps);
                   }}
@@ -2572,94 +2891,26 @@ export const EdgeBrowser: React.FC = () => {
 
                 {/* User Avatar */}
                 <div
+                  onClick={() => setShowGoogleAccountModal(true)}
                   title="Google Account: Windows 10 User"
                   className="w-8 h-8 rounded-full bg-blue-600 text-white font-medium flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-blue-400"
                 >
                   W
                 </div>
+
+                {/* Google Apps Dropdown */}
+                {showGoogleApps && (
+                  <GoogleAppsWaffle
+                    onNavigate={navigateTo}
+                    onClose={() => setShowGoogleApps(false)}
+                    onOpenAccountModal={() => {
+                      setShowGoogleApps(false);
+                      setShowGoogleAccountModal(true);
+                    }}
+                  />
+                )}
               </div>
             </div>
-
-            {/* Google Apps Dropdown */}
-            {showGoogleApps && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                className="absolute right-6 top-14 z-50 bg-white dark:bg-[#303134] border border-zinc-200 dark:border-zinc-700 rounded-2xl shadow-2xl p-4 w-72"
-              >
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <button
-                    onClick={() => {
-                      setShowGoogleApps(false);
-                      navigateTo('google', 'https://www.google.com', 'Google');
-                    }}
-                    className="flex flex-col items-center p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <GoogleGIcon className="w-8 h-8 mb-1" />
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300">Search</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowGoogleApps(false);
-                      handleGoogleSearch('Google Maps satellite navigation');
-                    }}
-                    className="flex flex-col items-center p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm font-bold mb-1">
-                      📍
-                    </div>
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300">Maps</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowGoogleApps(false);
-                      handleGoogleSearch('YouTube trending');
-                    }}
-                    className="flex flex-col items-center p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-sm font-bold mb-1">
-                      ▶️
-                    </div>
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300">YouTube</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowGoogleApps(false);
-                      handleGoogleSearch('Google News headlines');
-                    }}
-                    className="flex flex-col items-center p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold mb-1">
-                      📰
-                    </div>
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300">News</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowGoogleApps(false);
-                      handleGoogleSearch('Gmail mail inbox');
-                    }}
-                    className="flex flex-col items-center p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-sm font-bold mb-1">
-                      ✉️
-                    </div>
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300">Gmail</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowGoogleApps(false);
-                      handleGoogleSearch('Google Drive files');
-                    }}
-                    className="flex flex-col items-center p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold mb-1">
-                      📁
-                    </div>
-                    <span className="text-[11px] text-zinc-700 dark:text-zinc-300">Drive</span>
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Google Center Brand & Search Bar */}
             <div className="flex-1 flex flex-col items-center justify-center px-4 -mt-10">
@@ -2670,7 +2921,7 @@ export const EdgeBrowser: React.FC = () => {
               {/* Google Search Form Pill */}
               <div className="w-full max-w-[584px] relative">
                 <form
-                  onSubmit={(e) => {
+                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                     e.preventDefault();
                     handleGoogleSearch(googleInput || 'Windows 10');
                   }}
@@ -2684,7 +2935,7 @@ export const EdgeBrowser: React.FC = () => {
                   <input
                     type="text"
                     value={googleInput}
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       setGoogleInput(e.target.value);
                       setShowSuggestions(true);
                     }}
@@ -2823,7 +3074,7 @@ export const EdgeBrowser: React.FC = () => {
                 />
 
                 <form
-                  onSubmit={(e) => {
+                  onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                     e.preventDefault();
                     handleGoogleSearch(googleInput || searchQuery);
                   }}
@@ -2832,7 +3083,7 @@ export const EdgeBrowser: React.FC = () => {
                   <input
                     type="text"
                     value={googleInput || searchQuery}
-                    onChange={(e) => setGoogleInput(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoogleInput(e.target.value)}
                     className="w-full bg-transparent outline-none text-xs sm:text-sm text-inherit"
                     placeholder="Search Google"
                   />
@@ -3515,7 +3766,7 @@ export const EdgeBrowser: React.FC = () => {
 <TITLE>Bookmarks</TITLE>
 <H1>Bookmarks</H1>
 <DL><p>
-${bookmarks.map((b) => `    <DT><A HREF="${b.url}">${b.title}</A>`).join('\n')}
+${bookmarks.map((b: BookmarkItem) => `    <DT><A HREF="${b.url}">${b.title}</A>`).join('\n')}
 </DL><p>`;
                     triggerRealDownload('edge_bookmarks.html', bookmarksHtml, 'text/html', 'code');
                   }}
@@ -3577,7 +3828,7 @@ SmartScreen Protection: Enabled
               </div>
             ) : (
               <div className="space-y-3">
-                {downloads.map((item) => (
+                {downloads.map((item: DownloadItem) => (
                   <div
                     key={item.id}
                     className="p-4 bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 rounded-xl flex items-center justify-between gap-4 shadow-2xs hover:shadow-sm transition-shadow"
@@ -3627,7 +3878,7 @@ SmartScreen Protection: Enabled
                       <button
                         onClick={() => {
                           soundEngine.playClick();
-                          setDownloads((prev) => prev.filter((d) => d.id !== item.id));
+                          setDownloads((prev: DownloadItem[]) => prev.filter((d) => d.id !== item.id));
                         }}
                         className="p-1 text-zinc-400 hover:text-red-500 transition-colors rounded cursor-pointer"
                         title="Delete from list"
@@ -3717,6 +3968,81 @@ SmartScreen Protection: Enabled
               />
             </div>
           </div>
+        )}
+
+        {/* VIEW K: YouTube Client */}
+        {activeTab.view === 'youtube' && (
+          <YouTubeApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* VIEW L: Gmail Webmail */}
+        {activeTab.view === 'gmail' && (
+          <GmailApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* VIEW M: Google Drive Cloud Storage */}
+        {activeTab.view === 'drive' && (
+          <GoogleDriveApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+            onDownloadFile={(name, content, mime) =>
+              triggerRealDownload(name, content, mime, 'code')
+            }
+          />
+        )}
+
+        {/* VIEW N: Google Maps Explorer */}
+        {activeTab.view === 'maps' && (
+          <GoogleMapsApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* VIEW O: Google Gemini AI Assistant */}
+        {activeTab.view === 'gemini' && (
+          <GoogleGeminiApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* VIEW P: Google Translate */}
+        {activeTab.view === 'translate' && (
+          <GoogleTranslateApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* VIEW Q: Google Keep Notes */}
+        {activeTab.view === 'keep' && (
+          <GoogleKeepApp
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* VIEW R: Google Services Hub & Firebase Config */}
+        {activeTab.view === 'googleServices' && (
+          <GoogleServicesHub
+            onNavigate={navigateTo}
+            onOpenAppsWaffle={() => setShowGoogleWaffleMenu(true)}
+          />
+        )}
+
+        {/* Google Account Modal Dialog */}
+        {showGoogleAccountModal && (
+          <GoogleAccountModal
+            onClose={() => setShowGoogleAccountModal(false)}
+            onNavigate={navigateTo}
+          />
         )}
 
         {/* VOICE SEARCH MODAL */}
@@ -4023,7 +4349,7 @@ SmartScreen Protection: Enabled
             {devToolsTab === 'console' && (
               <div className="flex flex-col h-full justify-between">
                 <div className="space-y-1 overflow-y-auto flex-1 mb-2 pr-1 font-mono">
-                  {consoleLogs.map((log) => (
+                  {consoleLogs.map((log: ConsoleEntry) => (
                     <div
                       key={log.id}
                       className={`flex items-start gap-2 py-0.5 border-b border-zinc-800/40 text-[11px] ${
@@ -4074,7 +4400,7 @@ SmartScreen Protection: Enabled
                   </div>
 
                   <form
-                    onSubmit={(e) => {
+                    onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                       e.preventDefault();
                       handleExecuteConsoleCommand(consoleInput);
                     }}
@@ -4084,7 +4410,7 @@ SmartScreen Protection: Enabled
                     <input
                       type="text"
                       value={consoleInput}
-                      onChange={(e) => setConsoleInput(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConsoleInput(e.target.value)}
                       placeholder="Type JavaScript expression to evaluate (e.g. 2 + 2, window.innerWidth)..."
                       className="w-full bg-transparent outline-none text-zinc-100 placeholder-zinc-500 font-mono text-xs"
                     />
@@ -4139,7 +4465,7 @@ SmartScreen Protection: Enabled
                     </tr>
                   </thead>
                   <tbody>
-                    {networkLogs.map((req) => (
+                    {networkLogs.map((req: NetworkEntry) => (
                       <tr key={req.id} className="border-b border-zinc-800/60 hover:bg-zinc-800/40">
                         <td className="py-1 text-blue-400 truncate max-w-xs">{req.url}</td>
                         <td className="py-1 text-emerald-400 font-bold">{req.status}</td>
