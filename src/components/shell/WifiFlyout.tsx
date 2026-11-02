@@ -30,7 +30,7 @@ export const WifiFlyout: React.FC<WifiFlyoutProps> = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed bottom-[44px] right-24 w-80 bg-[#1f1f1f]/95 backdrop-blur-xl text-white border-t border-x border-zinc-700/60 shadow-2xl z-50 p-4 font-sans select-none animate-fadeIn rounded-t-sm"
+      className="fixed bottom-[40px] right-24 w-80 bg-[#1e1e1e]/95 backdrop-blur-2xl text-white border-t border-x border-white/10 shadow-2xl z-50 p-4 font-sans select-none animate-fadeIn rounded-t-xs"
     >
       <div className="flex items-center justify-between mb-3 border-b border-zinc-700/60 pb-2">
         <span className="text-xs font-semibold text-zinc-300">Available Networks</span>

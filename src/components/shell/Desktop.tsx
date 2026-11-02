@@ -6,6 +6,7 @@ import {
   Monitor,
   Palette,
   LayoutGrid,
+  Terminal,
 } from 'lucide-react';
 import { DesktopIcon, FileItem, AppId } from '../../types/os';
 import { AppIcon } from '../common/AppIcon';
@@ -64,7 +65,9 @@ export const Desktop: React.FC<DesktopProps> = ({
     { id: 'sc-thispc', title: 'This PC', appId: 'explorer', icon: 'explorer' },
     { id: 'sc-recycle', title: 'Recycle Bin', appId: 'recyclebin', icon: 'recyclebin' },
     { id: 'sc-edge', title: 'Microsoft Edge', appId: 'edge', icon: 'edge' },
+    { id: 'sc-google', title: 'Google Services', appId: 'edge', icon: 'globe' },
     { id: 'sc-dxdiag', title: 'DirectX 12 Diagnostic', appId: 'dxdiag', icon: 'dxdiag' },
+    { id: 'sc-notepad', title: 'Notepad', appId: 'notepad', icon: 'notepad' },
   ];
 
   const desktopFiles = files.filter((f) => f.location === 'desktop' && !f.isRecycled);
@@ -202,7 +205,7 @@ export const Desktop: React.FC<DesktopProps> = ({
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      className="fixed inset-0 bottom-[44px] bg-cover bg-center select-none font-sans overflow-hidden bg-[#004e92]"
+      className="fixed inset-0 bottom-[40px] bg-cover bg-center select-none font-sans overflow-hidden bg-[#004e92]"
       style={{
         backgroundImage: `url(${wallpaper}), linear-gradient(135deg, #091222 0%, #004e92 50%, #001f3f 100%)`,
       }}
@@ -318,11 +321,21 @@ export const Desktop: React.FC<DesktopProps> = ({
         })}
       </div>
 
+      {/* Windows 10 Desktop Watermark */}
+      <div className="fixed bottom-14 right-4 pointer-events-none select-none text-right z-10 opacity-75">
+        <div className="text-[13px] font-semibold text-white/95 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+          Windows 10 Pro
+        </div>
+        <div className="text-[11px] text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+          Evaluation copy. Build 19045.5011
+        </div>
+      </div>
+
       {/* Desktop Right-Click Context Menu */}
       {contextMenu.visible && (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="fixed bg-white/95 backdrop-blur-xl border border-zinc-300 shadow-xl rounded-sm py-1 z-50 text-xs text-zinc-800 w-52 font-sans animate-fadeIn select-none"
+          className="fixed bg-[#232323]/95 backdrop-blur-2xl border border-white/15 shadow-2xl rounded-xs py-1 z-50 text-xs text-zinc-100 w-56 font-sans animate-fadeIn select-none"
           style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}
         >
           {/* Target Icon Actions */}
@@ -338,11 +351,11 @@ export const Desktop: React.FC<DesktopProps> = ({
                   }
                   setContextMenu({ ...contextMenu, visible: false });
                 }}
-                className="w-full text-left px-3 py-1.5 hover:bg-blue-600 hover:text-white flex items-center justify-between font-semibold"
+                className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center justify-between font-semibold"
               >
                 <span>Open {contextMenu.target.title ? `"${contextMenu.target.title}"` : ''}</span>
               </button>
-              <div className="border-t border-zinc-200 my-1" />
+              <div className="border-t border-white/10 my-1" />
             </>
           )}
 
@@ -352,11 +365,11 @@ export const Desktop: React.FC<DesktopProps> = ({
               setIconSize(iconSize === 'normal' ? 'large' : iconSize === 'large' ? 'small' : 'normal');
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-100 flex items-center justify-between"
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center justify-between transition-colors"
           >
-            <div className="flex items-center gap-2">
-              <LayoutGrid size={14} className="text-zinc-500" />
-              <span>Icon size: {iconSize}</span>
+            <div className="flex items-center gap-2.5">
+              <LayoutGrid size={14} className="text-zinc-400 group-hover:text-white" />
+              <span>Icon size: {iconSize.charAt(0).toUpperCase() + iconSize.slice(1)}</span>
             </div>
           </button>
 
@@ -366,13 +379,13 @@ export const Desktop: React.FC<DesktopProps> = ({
               soundEngine.playClick();
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-100 flex items-center gap-2"
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center gap-2.5 transition-colors"
           >
-            <RefreshCw size={14} className="text-zinc-500" />
+            <RefreshCw size={14} className="text-zinc-400" />
             <span>Refresh</span>
           </button>
 
-          <div className="border-t border-zinc-200 my-1" />
+          <div className="border-t border-white/10 my-1" />
 
           {/* New Folder */}
           <button
@@ -380,9 +393,9 @@ export const Desktop: React.FC<DesktopProps> = ({
               onCreateFolder('New folder', 'desktop');
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-100 flex items-center gap-2"
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center gap-2.5 transition-colors"
           >
-            <FolderPlus size={14} className="text-amber-500" />
+            <FolderPlus size={14} className="text-amber-400" />
             <span>New folder</span>
           </button>
 
@@ -392,13 +405,25 @@ export const Desktop: React.FC<DesktopProps> = ({
               onCreateFile('New Text Document.txt', '', 'desktop');
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-100 flex items-center gap-2"
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center gap-2.5 transition-colors"
           >
-            <FilePlus size={14} className="text-blue-500" />
+            <FilePlus size={14} className="text-sky-400" />
             <span>New text document</span>
           </button>
 
-          <div className="border-t border-zinc-200 my-1" />
+          <div className="border-t border-white/10 my-1" />
+
+          {/* Open in Terminal */}
+          <button
+            onClick={() => {
+              onOpenApp('cmd');
+              setContextMenu({ ...contextMenu, visible: false });
+            }}
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center gap-2.5 transition-colors"
+          >
+            <Terminal size={14} className="text-emerald-400" />
+            <span>Open in Terminal</span>
+          </button>
 
           {/* Display Settings */}
           <button
@@ -406,9 +431,9 @@ export const Desktop: React.FC<DesktopProps> = ({
               onOpenApp('settings');
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-100 flex items-center gap-2"
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center gap-2.5 transition-colors"
           >
-            <Monitor size={14} className="text-zinc-500" />
+            <Monitor size={14} className="text-zinc-400" />
             <span>Display settings</span>
           </button>
 
@@ -418,9 +443,9 @@ export const Desktop: React.FC<DesktopProps> = ({
               onOpenApp('settings');
               setContextMenu({ ...contextMenu, visible: false });
             }}
-            className="w-full text-left px-3 py-1.5 hover:bg-zinc-100 flex items-center gap-2"
+            className="w-full text-left px-3 py-1.5 hover:bg-[#0078d7] hover:text-white flex items-center gap-2.5 transition-colors"
           >
-            <Palette size={14} className="text-purple-500" />
+            <Palette size={14} className="text-purple-400" />
             <span>Personalize</span>
           </button>
         </div>

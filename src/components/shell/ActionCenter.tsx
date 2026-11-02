@@ -34,7 +34,7 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed top-0 right-0 bottom-[44px] w-84 sm:w-96 bg-[#1f1f1f]/95 backdrop-blur-xl text-white border-l border-zinc-700/60 shadow-2xl z-50 flex flex-col font-sans select-none animate-slideLeft"
+      className="fixed top-0 right-0 bottom-[40px] w-84 sm:w-96 bg-[#181818]/95 backdrop-blur-3xl text-white border-l border-white/10 shadow-2xl z-50 flex flex-col font-sans select-none animate-slideLeft"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">

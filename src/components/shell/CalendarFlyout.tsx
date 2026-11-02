@@ -49,7 +49,7 @@ export const CalendarFlyout: React.FC<CalendarFlyoutProps> = ({ onClose }) => {
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed bottom-[44px] right-0 w-80 bg-[#1f1f1f]/95 backdrop-blur-xl text-white border-t border-l border-zinc-700/60 shadow-2xl z-50 p-4 font-sans select-none animate-fadeIn"
+      className="fixed bottom-[40px] right-0 w-80 bg-[#1e1e1e]/95 backdrop-blur-2xl text-white border-t border-l border-white/10 shadow-2xl z-50 p-4 font-sans select-none animate-fadeIn"
     >
       {/* Time Display */}
       <div className="border-b border-zinc-700/60 pb-3 mb-3">

@@ -50,7 +50,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({
   return (
     <div
       onClick={(e) => e.stopPropagation()}
-      className="fixed bottom-[44px] left-0 w-full sm:w-[680px] h-[520px] bg-[#1f1f1f]/95 backdrop-blur-2xl text-white border-t border-r border-zinc-700/60 shadow-2xl z-50 flex flex-col font-sans select-none animate-slideUp"
+      className="fixed bottom-[40px] left-0 w-full sm:w-[680px] h-[520px] bg-[#181818]/95 backdrop-blur-3xl text-white border-t border-r border-white/10 shadow-2xl z-50 flex flex-col font-sans select-none animate-slideUp"
     >
       {/* Top Filter Tabs */}
       <div className="flex items-center gap-1 px-4 pt-3 pb-2 border-b border-zinc-800 text-xs text-zinc-400">

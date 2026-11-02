@@ -630,6 +630,7 @@ export default function App() {
             handleFocusWindow(win.id);
           }
         }}
+        onCloseWindow={handleCloseWindow}
         onPeekDesktop={handlePeekDesktop}
       />
 

@@ -167,7 +167,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             x: 0,
             y: 0,
             width: window.innerWidth / 2,
-            height: window.innerHeight - 44,
+            height: window.innerHeight - 40,
             snapped: 'left',
           });
           soundEngine.playClick();
@@ -176,7 +176,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             x: window.innerWidth / 2,
             y: 0,
             width: window.innerWidth / 2,
-            height: window.innerHeight - 44,
+            height: window.innerHeight - 40,
             snapped: 'right',
           });
           soundEngine.playClick();
@@ -210,7 +210,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         top: 0,
         left: 0,
         width: '100%',
-        height: 'calc(100vh - 44px)',
+        height: 'calc(100vh - 40px)',
         zIndex: win.zIndex,
       }
     : isSnapLeft
@@ -218,7 +218,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         top: 0,
         left: 0,
         width: '50%',
-        height: 'calc(100vh - 44px)',
+        height: 'calc(100vh - 40px)',
         zIndex: win.zIndex,
       }
     : isSnapRight
@@ -226,7 +226,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         top: 0,
         left: '50%',
         width: '50%',
-        height: 'calc(100vh - 44px)',
+        height: 'calc(100vh - 40px)',
         zIndex: win.zIndex,
       }
     : {
@@ -242,12 +242,12 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       {/* Aero Snap Ghost Preview Outline */}
       {snapGhost && (
         <div
-          className={`fixed pointer-events-none z-50 border-2 border-blue-400 bg-blue-500/20 backdrop-blur-xs transition-all duration-150 animate-fadeIn ${
+          className={`fixed pointer-events-none z-50 border-2 border-[#0078d7] bg-[#0078d7]/20 backdrop-blur-xs transition-all duration-150 animate-fadeIn ${
             snapGhost === 'full'
-              ? 'inset-0 bottom-[44px]'
+              ? 'inset-0 bottom-[40px]'
               : snapGhost === 'left'
-              ? 'left-0 top-0 w-1/2 bottom-[44px]'
-              : 'right-0 top-0 w-1/2 bottom-[44px]'
+              ? 'left-0 top-0 w-1/2 bottom-[40px]'
+              : 'right-0 top-0 w-1/2 bottom-[40px]'
           }`}
         />
       )}
@@ -257,39 +257,44 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         ref={frameRef}
         onMouseDown={onFocus}
         style={style}
-        className={`fixed flex flex-col rounded-t-sm shadow-2xl overflow-hidden border transition-[box-shadow] select-none ${
+        className={`fixed flex flex-col rounded-t-xs shadow-2xl overflow-hidden border transition-[box-shadow] select-none ${
           isActive
-            ? 'border-zinc-400/80 shadow-black/40 ring-1 ring-black/10'
-            : 'border-zinc-300/50 shadow-black/20 opacity-95'
+            ? 'border-zinc-400/80 shadow-black/60 ring-1 ring-black/20'
+            : 'border-zinc-500/40 shadow-black/30 opacity-95'
         }`}
       >
+        {/* Active Window Top Accent Stripe */}
+        {isActive && (
+          <div
+            className="h-0.5 w-full bg-[#0078d7] shrink-0"
+            style={accentColor ? { backgroundColor: accentColor } : undefined}
+          />
+        )}
+
         {/* Title Bar */}
         <div
           onMouseDown={handleMouseDownHeader}
           onDoubleClick={onToggleMaximize}
-          className={`h-8 flex items-center justify-between px-2 cursor-default shrink-0 transition-colors ${
+          className={`h-8 flex items-center justify-between pl-2.5 pr-0 cursor-default shrink-0 transition-colors ${
             isActive
               ? theme === 'dark'
                 ? 'bg-[#1f1f1f] text-white'
-                : 'bg-white text-zinc-800'
+                : 'bg-white text-zinc-900'
+              : theme === 'dark'
+              ? 'bg-[#2b2b2b] text-zinc-400'
               : 'bg-[#e5e5e5] text-zinc-500'
           }`}
-          style={
-            isActive && accentColor && false /* optional title accent bar */
-              ? { backgroundColor: accentColor, color: '#ffffff' }
-              : undefined
-          }
         >
           {/* App Icon + Title */}
           <div className="flex items-center gap-2 overflow-hidden pointer-events-none">
             <AppIcon appId={win.appId} size={15} />
-            <span className="text-xs font-normal truncate tracking-wide">
+            <span className="text-xs font-normal truncate tracking-normal">
               {win.title}
             </span>
           </div>
 
           {/* Window Control Buttons: Minimize, Maximize, Close */}
-          <div className="flex items-center h-full -mr-2">
+          <div className="flex items-center h-full">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -297,7 +302,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
                 onMinimize();
               }}
               title="Minimize"
-              className="h-full px-3 hover:bg-zinc-200 dark:hover:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-colors"
+              className="h-full w-11 hover:bg-white/10 dark:hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
             >
               <Minus size={13} strokeWidth={2} />
             </button>
@@ -308,7 +313,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
                 onToggleMaximize();
               }}
               title={isMax ? 'Restore Down' : 'Maximize'}
-              className="h-full px-3 hover:bg-zinc-200 dark:hover:bg-zinc-700/60 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-colors"
+              className="h-full w-11 hover:bg-white/10 dark:hover:bg-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
             >
               {isMax ? <Copy size={11} strokeWidth={2} /> : <Square size={11} strokeWidth={2} />}
             </button>
@@ -319,7 +324,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
                 onClose();
               }}
               title="Close"
-              className="h-full px-3.5 hover:bg-red-600 hover:text-white text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-colors"
+              className="h-full w-12 hover:bg-[#e81123] hover:text-white text-zinc-400 flex items-center justify-center transition-colors"
             >
               <X size={14} strokeWidth={2} />
             </button>
