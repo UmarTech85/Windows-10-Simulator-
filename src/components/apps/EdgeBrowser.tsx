@@ -1180,8 +1180,7 @@ export const EdgeBrowser: React.FC<EdgeBrowserProps> = ({
     } else if (
       lower === 'translate' ||
       lower === 'translate.google.com' ||
-      lower === 'https://translate.google.com' ||
-      lower.startsWith('https://translate.google.com')
+      isHttpsUrlForHost(q, 'translate.google.com')
     ) {
       navigateTo('translate', 'https://translate.google.com', 'Google Translate');
     } else if (
