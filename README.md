@@ -10,11 +10,12 @@ The Windows 10 Simulator Application Has Been Generated With A High-Fidelity Des
 **Key Features Implemented**
 
 • **Desktop Shell & Aero Snap**
-      ° High-resolution Windows 10 wallpapers (Default Hero Blueprint, Moraine Alpine Lake, and Abstract Dark Ribbon) selectable via Settings or Photos.
 
-      ° Desktop icon grid with drag marquee rubber-band selection and right-click desktop context menu (View Size, Refresh, New Folder, New Text File, Display Settings, Personalize).
+° High-resolution Windows 10 wallpapers (Default Hero Blueprint, Moraine Alpine Lake, and Abstract Dark Ribbon) selectable via Settings or Photos.
 
-  ° **Aero Snap Window Management**: Dragging any window to the top edge displays the full-screen ghost preview and maximizes on release; dragging to the left or right edges snaps to a 50% split. Double-clicking title bars toggles maximize/restore.
+° Desktop icon grid with drag marquee rubber-band selection and right-click desktop context menu (View Size, Refresh, New Folder, New Text File, Display Settings, Personalize).
+
+° **Aero Snap Window Management**: Dragging any window to the top edge displays the full-screen ghost preview and maximizes on release; dragging to the left or right edges snaps to a 50% split. Double-clicking title bars toggles maximize/restore.
 
 
 • **Functional Start Menu**
