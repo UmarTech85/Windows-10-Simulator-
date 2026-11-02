@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: Node.js CI
 
 on:
   push:
@@ -14,14 +14,17 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Configure
-        run: ./configure
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Build
-        run: make
+        run: npm run build
 
-      - name: Run tests
-        run: make check
-
-      - name: Check distribution
-        run: make distcheck
+      - name: Lint
+        run: npm run lint
