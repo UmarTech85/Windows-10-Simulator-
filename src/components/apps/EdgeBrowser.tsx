@@ -164,6 +164,15 @@ const isGoogleDomainUrl = (url: string) => {
   }
 };
 
+const isHttpsUrlForHost = (url: string, hostname: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === 'https:' && parsedUrl.hostname === hostname;
+  } catch {
+    return false;
+  }
+};
+
 const getSafeHttpUrl = (url: string) => {
   try {
     const parsedUrl = new URL(url);
@@ -1178,8 +1187,7 @@ export const EdgeBrowser: React.FC<EdgeBrowserProps> = ({
     } else if (
       lower === 'keep' ||
       lower === 'keep.google.com' ||
-      lower === 'https://keep.google.com' ||
-      lower.startsWith('https://keep.google.com')
+      isHttpsUrlForHost(q, 'keep.google.com')
     ) {
       navigateTo('keep', 'https://keep.google.com', 'Google Keep');
     } else if (
