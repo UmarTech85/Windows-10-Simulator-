@@ -1,4 +1,3 @@
-/** @jsxRuntime classic */
 // @ts-ignore - React is provided by the host runtime in this project
 import React, { useState, useEffect, useRef } from 'react';
 import { GrooveTrack, MusicPlayerState } from '../../types/music';

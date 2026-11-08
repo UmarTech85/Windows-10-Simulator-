@@ -1,4 +1,3 @@
-/** @jsxRuntime classic */
 import React, { useState, useEffect, useRef } from 'react';
 import { History, Trash2, Delete } from 'lucide-react';
 import { soundEngine } from '../../utils/sound';

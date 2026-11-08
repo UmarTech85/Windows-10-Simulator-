@@ -1,4 +1,3 @@
-/** @jsxRuntime classic */
 import React, { useState, useRef, useEffect } from 'react';
 import { AppId } from '../../types/os';
 import { soundEngine } from '../../utils/sound';

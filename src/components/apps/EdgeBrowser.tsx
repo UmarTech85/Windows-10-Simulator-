@@ -1,4 +1,3 @@
-/** @jsxRuntime classic */
 // @ts-nocheck
 import React from "react";
 import { soundEngine } from "../../utils/sound";
