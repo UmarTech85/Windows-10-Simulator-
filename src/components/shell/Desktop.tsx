@@ -66,7 +66,6 @@ export const Desktop: React.FC<DesktopProps> = ({
     { id: 'sc-recycle', title: 'Recycle Bin', appId: 'recyclebin', icon: 'recyclebin' },
     { id: 'sc-edge', title: 'Microsoft Edge', appId: 'edge', icon: 'edge' },
     { id: 'sc-google', title: 'Google Services', appId: 'edge', icon: 'globe' },
-    { id: 'sc-dxdiag', title: 'DirectX 12 Diagnostic', appId: 'dxdiag', icon: 'dxdiag' },
     { id: 'sc-notepad', title: 'Notepad', appId: 'notepad', icon: 'notepad' },
   ];
 

@@ -343,30 +343,6 @@ export const StartMenu: React.FC<StartMenuProps> = ({
               </div>
             </div>
 
-            {/* DirectX 12 Ultimate Tile (Wide) */}
-            <div
-              onClick={() => handleAppClick('dxdiag')}
-              className="col-span-2 h-24 bg-gradient-to-r from-zinc-900 via-indigo-950 to-blue-900 border border-blue-500/30 p-2.5 rounded-xs cursor-pointer flex flex-col justify-between hover:scale-[1.01] transition-transform shadow-sm group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AppIcon appId="dxdiag" size={24} />
-                  <span className="text-xs font-bold text-white tracking-wide">DirectX 12 Ultimate</span>
-                </div>
-                <span className="text-[9px] bg-cyan-400 text-black px-1.5 py-0.5 rounded font-black tracking-tight">
-                  FEATURE LEVEL 12_2
-                </span>
-              </div>
-              <div className="text-[10px] text-zinc-300 flex items-center gap-2">
-                <span>⚡ Hardware Raytracing</span>
-                <span>•</span>
-                <span>Mesh Shaders</span>
-                <span>•</span>
-                <span>VRS Tier 2</span>
-              </div>
-              <div className="text-[9px] text-cyan-300">NVIDIA GeForce RTX 4090 · WDDM 3.1</div>
-            </div>
-
             {/* Minesweeper Tile */}
             <div
               onClick={() => handleAppClick('minesweeper')}

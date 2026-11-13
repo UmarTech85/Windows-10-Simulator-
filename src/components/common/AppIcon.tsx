@@ -16,7 +16,6 @@ import {
   Code,
   Music,
   Cpu,
-  Box,
 } from 'lucide-react';
 import { AppId } from '../../types/os';
 
@@ -146,19 +145,6 @@ export const AppIcon: React.FC<AppIconProps> = ({
       return (
         <div className={`relative flex items-center justify-center ${isEmptyRecycleBin ? 'text-slate-400' : 'text-blue-400'} drop-shadow-sm ${className}`}>
           <Trash2 size={size} strokeWidth={1.8} />
-        </div>
-      );
-
-    case 'dxdiag':
-    case 'directx':
-      return (
-        <div className={`relative flex items-center justify-center bg-gradient-to-tr from-blue-700 to-indigo-500 text-white rounded p-1 shadow-sm ${className}`}>
-          <div className="relative flex items-center justify-center">
-            <Box size={size - 4} strokeWidth={2} />
-            <span className="absolute -bottom-1 -right-1 text-[7px] font-black bg-cyan-400 text-black px-0.5 rounded leading-none">
-              12
-            </span>
-          </div>
         </div>
       );
 

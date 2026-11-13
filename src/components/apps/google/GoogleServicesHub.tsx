@@ -155,7 +155,7 @@ export const GoogleServicesHub: React.FC<GoogleServicesHubProps> = ({
                   Firebase & Google Services Configuration
                 </h2>
                 <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                  Loaded from <span className="font-mono text-zinc-700 dark:text-zinc-300">/public/assets/aistudio/google-services_10cb5c35.json</span>
+                  Loaded from <span className="font-mono text-zinc-700 dark:text-zinc-300">google-services.json</span>
                 </p>
               </div>
             </div>

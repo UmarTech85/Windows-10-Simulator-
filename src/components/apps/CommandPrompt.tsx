@@ -220,7 +220,7 @@ export const CommandPrompt: React.FC<CommandPromptProps> = ({
             'OS Configuration:          Standalone Workstation',
             'OS Build Type:             Multiprocessor Free',
             'Registered Owner:          User',
-            'System Manufacturer:       AI Studio Virtual Machine',
+            'System Manufacturer:       Microsoft Virtual Machine',
             'System Model:              Hyper-Core x64 Simulation',
             'Processor(s):              1 Processor(s) Installed.',
             '                           [01]: Intel64 Family 6 Model 183 Stepping 1 ~3200 Mhz',
