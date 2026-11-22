@@ -1,0 +1,6 @@
+{
+  "name": "Windows 10 Simulator",
+  "description": "An authentic, interactive Windows 10 desktop simulator complete with Start Menu, Live Tiles, File Explorer, Edge browser, Command Prompt, MS Paint, Notepad, Calculator, Minesweeper, Task Manager, Settings, sound effects, and Aero Snap.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
